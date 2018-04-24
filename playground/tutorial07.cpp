@@ -1,3 +1,13 @@
+//todo:
+//class shader
+//class model .buffer model.draw
+//class fenser, steuerung
+//add noise
+//tesselate only visible area in specific range?
+
+
+
+
 // Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,10 +57,12 @@ int main( )
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 1024, 768, "Tutorial 07 - Model Loading", NULL, NULL);
+    // Open a window and create its OpenGL context
+    int resolutionWidth = 1600;
+    int resolutionHeight = 1200;
+	window = glfwCreateWindow( resolutionWidth, resolutionHeight, "Tutorial 07 - Model Loading", NULL, NULL);
 	if( window == NULL ){
-		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
+		fprintf( stderr, "Failed to open GLFW window. If you have an older Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
 		getchar();
 		glfwTerminate();
 		return -1;
@@ -73,7 +85,7 @@ int main( )
     
     // Set the mouse at the center of the screen
     glfwPollEvents();
-    glfwSetCursorPos(window, 1024/2, 768/2);
+    glfwSetCursorPos(window, resolutionWidth/2, resolutionHeight/2);
 
 	// Dark blue background
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -84,7 +96,8 @@ int main( )
 	glDepthFunc(GL_LESS); 
 
 	// Cull triangles which normal is not towards the camera
-	glDisable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -104,15 +117,15 @@ int main( )
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
-    TriangleTesselation.Tesselate(7);
+    TriangleTesselation.Tesselate(5);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
-    std::cout << triangles->size() ;
-    std::vector<CTriangle> tmp = *triangles;
+    std::cout << "shown faces: " << triangles->size() ;
+    //std::vector<CTriangle> tmp = *triangles;
 
     // Read our .obj file
 	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec2> uvs;
+	std::vector<glm::vec2> uvs; //not in use
 	std::vector<glm::vec3> normals; // Won't be used at the moment.
 	//bool res = loadOBJ("../playground/cube.obj", vertices, uvs, normals);
     ///bool res = loadOBJ(triangles, vertices, uvs, normals);
@@ -203,10 +216,6 @@ int main( )
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
-    //todo
-    //class shader
-    //class model .buffer model.draw
-    //class fenser, steuerung
 
 	return 0;
 }

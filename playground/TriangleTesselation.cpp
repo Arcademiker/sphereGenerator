@@ -1,6 +1,7 @@
 #include <cstdlib>
 //#include "stdafx.h"
 #include "TriangleTesselation.h"
+#include <cmath>
 
 CTriangleTesselation::CTriangleTesselation(float fRadius)
 {
@@ -53,7 +54,7 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 	}
 	//ComputeTextureCoordinates();
 }
-
+/*
 float CalculateAngle(float fX, float fY)
 {
 	static float fPI = 3.1415926f;
@@ -72,7 +73,7 @@ float CalculateAngle(float fX, float fY)
 	return fResult;
 }
 
-/*
+
 void CorrectTextureOverflowU(CTriangle& Triangle)
 {
 	static float fPI = 3.1415926f;
@@ -133,7 +134,8 @@ void CTriangleTesselation::GenerateTetraeder()
 	m_vecTriangleList[0]->clear();
 	m_vecTriangleList[1]->clear();
 	m_nArrayResult = 0;
-		
+
+    /* //tetraeder
 	CTriangle::SPoint3D Point1;
 	Point1.fX = -1.0f;
 	Point1.fY = -1.0f;
@@ -166,4 +168,116 @@ void CTriangleTesselation::GenerateTetraeder()
 	m_vecTriangleList[0]->push_back(CTriangle(Point4, Point2, Point1));
 	m_vecTriangleList[0]->push_back(CTriangle(Point1, Point2, Point3));
 	m_vecTriangleList[0]->push_back(CTriangle(Point2, Point4, Point3));
+     */
+
+    //icosahedron:
+    float phi = 1.0f / 2.0f*(1.0f + std::sqrt(5.0f));
+
+    CTriangle::SPoint3D Point1;
+    Point1.fX = 0.0f;
+    Point1.fY = 1.0f;
+    Point1.fZ = phi;
+    Point1.Normalize();
+    Point1 = Point1 * m_fRadius;
+
+    CTriangle::SPoint3D Point2;
+    Point2.fX = 0.0f;
+    Point2.fY = 1.0f;
+    Point2.fZ = -phi;
+    Point2.Normalize();
+    Point2 = Point2 * m_fRadius;
+
+    CTriangle::SPoint3D Point3;
+    Point3.fX = 0.0f;
+    Point3.fY = -1.0f;
+    Point3.fZ = phi;
+    Point3.Normalize();
+    Point3 = Point3 * m_fRadius;
+
+    CTriangle::SPoint3D Point4;
+    Point4.fX = 0.0f;
+    Point4.fY = -1.0f;
+    Point4.fZ = -phi;
+    Point4.Normalize();
+    Point4 = Point4 * m_fRadius;
+
+    CTriangle::SPoint3D Point5;
+    Point5.fX = 1.0f;
+    Point5.fY = phi;
+    Point5.fZ = 0.0f;
+    Point5.Normalize();
+    Point5 = Point5 * m_fRadius;
+
+    CTriangle::SPoint3D Point6;
+    Point6.fX = 1.0f;
+    Point6.fY = -phi;
+    Point6.fZ = 0.0f;
+    Point6.Normalize();
+    Point6 = Point6 * m_fRadius;
+
+    CTriangle::SPoint3D Point7;
+    Point7.fX = -1.0f;
+    Point7.fY = phi;
+    Point7.fZ = 0.0f;
+    Point7.Normalize();
+    Point7 = Point7 * m_fRadius;
+
+    CTriangle::SPoint3D Point8;
+    Point8.fX = -1.0f;
+    Point8.fY = -phi;
+    Point8.fZ = 0.0f;
+    Point8.Normalize();
+    Point8 = Point8 * m_fRadius;
+
+    CTriangle::SPoint3D Point9;
+    Point9.fX = phi;
+    Point9.fY = 0.0f;
+    Point9.fZ = 1.0f;
+    Point9.Normalize();
+    Point9 = Point9 * m_fRadius;
+
+    CTriangle::SPoint3D PointA;
+    PointA.fX = -phi;
+    PointA.fY = 0.0f;
+    PointA.fZ = 1.0f;
+    PointA.Normalize();
+    PointA = PointA * m_fRadius;
+
+    CTriangle::SPoint3D PointB;
+    PointB.fX = phi;
+    PointB.fY = 0.0f;
+    PointB.fZ = -1.0f;
+    PointB.Normalize();
+    PointB = PointB * m_fRadius;
+
+    CTriangle::SPoint3D PointC;
+    PointC.fX = -phi;
+    PointC.fY = 0.0f;
+    PointC.fZ = -1.0f;
+    PointC.Normalize();
+    PointC = PointC * m_fRadius;
+
+    //northpol
+    m_vecTriangleList[0]->push_back(CTriangle(Point7, Point5, Point1));
+    m_vecTriangleList[0]->push_back(CTriangle(Point7, Point2, Point5));
+    m_vecTriangleList[0]->push_back(CTriangle(Point7, PointC, Point2));
+    m_vecTriangleList[0]->push_back(CTriangle(Point7, PointA, PointC));
+    m_vecTriangleList[0]->push_back(CTriangle(Point7, Point1, PointA));
+    //southpol
+    m_vecTriangleList[0]->push_back(CTriangle(Point6, Point4, Point8));
+    m_vecTriangleList[0]->push_back(CTriangle(Point6, Point8, Point3));
+    m_vecTriangleList[0]->push_back(CTriangle(Point6, Point3, Point9));
+    m_vecTriangleList[0]->push_back(CTriangle(Point6, Point9, PointB));
+    m_vecTriangleList[0]->push_back(CTriangle(Point6, PointB, Point4));
+    //belt
+    m_vecTriangleList[0]->push_back(CTriangle(PointA, Point8, PointC));
+    m_vecTriangleList[0]->push_back(CTriangle(Point8, Point4, PointC));
+    m_vecTriangleList[0]->push_back(CTriangle(PointC, Point4, Point2));
+    m_vecTriangleList[0]->push_back(CTriangle(Point4, PointB, Point2));
+    m_vecTriangleList[0]->push_back(CTriangle(Point2, PointB, Point5));
+    m_vecTriangleList[0]->push_back(CTriangle(PointB, Point9, Point5));
+    m_vecTriangleList[0]->push_back(CTriangle(Point5, Point9, Point1));
+    m_vecTriangleList[0]->push_back(CTriangle(Point9, Point3, Point1));
+    m_vecTriangleList[0]->push_back(CTriangle(Point1, Point3, PointA));
+    m_vecTriangleList[0]->push_back(CTriangle(Point3, Point8, PointA));
 }
