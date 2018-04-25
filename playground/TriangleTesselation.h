@@ -15,7 +15,7 @@ public:
 private:
 
 	void GenerateTetraeder();
-	//void ComputeTextureCoordinates();
+	void ComputeTextureCoordinates();
 
 	size_t m_nArrayResult = 0;
 	float m_fRadius = 1.0f;

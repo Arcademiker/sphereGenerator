@@ -1,7 +1,6 @@
 #include <cstdlib>
 //#include "stdafx.h"
 #include "TriangleTesselation.h"
-#include <cmath>
 
 CTriangleTesselation::CTriangleTesselation(float fRadius)
 {
@@ -52,18 +51,19 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 		}
 		m_nArrayResult = 1 - m_nArrayResult;
 	}
-	//ComputeTextureCoordinates();
+	ComputeTextureCoordinates();
 }
+
 /*
 float CalculateAngle(float fX, float fY)
 {
 	static float fPI = 3.1415926f;
 
 	float fResult;
-	if (fX > 0 && fY > 0) { fResult = atan(fY / fX); }
-	else if (fX < 0 && fY > 0) { fResult = atan(fX / fY) + fPI / 2.0f; }
-	else if (fX < 0 && fY < 0) { fResult = atan(fY / fX) + fPI; }
-	else if (fX > 0 && fY < 0) { fResult = atan(fX / fY) + fPI / 3.0f * 4.0f; }
+	if (fX > 0 && fY > 0) { fResult = atanf(fY / fX)/(2*fPI); }
+	else if (fX < 0 && fY > 0) { fResult = atanf(fX / fY)/(2*fPI) + fPI / 2.0f; }
+	else if (fX < 0 && fY < 0) { fResult = atanf(fY / fX)/(2*fPI) + fPI; }
+	else if (fX > 0 && fY < 0) { fResult = atanf(fX / fY)/(2*fPI) + fPI / 3.0f * 4.0f; }
 	else if (fX == 0 && fY > 0) { fResult = fPI / 2.0f; }
 	else if (fX == 0 && fY < 0) { fResult = fPI / 3.0f * 4.0f; }
 	else if (fX > 0 && fY == 0) { fResult = 0; }
@@ -72,7 +72,7 @@ float CalculateAngle(float fX, float fY)
 
 	return fResult;
 }
-
+*/
 
 void CorrectTextureOverflowU(CTriangle& Triangle)
 {
@@ -105,8 +105,10 @@ void CorrectTextureOverflowU(CTriangle& Triangle)
 	}
 }
 
+/*
 void CTriangleTesselation::ComputeTextureCoordinates()
 {
+	static float fPI = 3.1415926f;
 	for (size_t nIterator = 0; nIterator < m_vecTriangleList[m_nArrayResult]->size(); ++nIterator)
 	{
 		CTriangle::SPoint3D* Point1 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint1();
@@ -116,12 +118,34 @@ void CTriangleTesselation::ComputeTextureCoordinates()
 		Point2->fU = CalculateAngle(Point2->fX, Point2->fZ);
 		Point3->fU = CalculateAngle(Point3->fX, Point3->fZ);
 		CorrectTextureOverflowU(m_vecTriangleList[m_nArrayResult]->at(nIterator));
-		Point1->fV = acos(Point1->fY / m_fRadius);
-		Point2->fV = acos(Point2->fY / m_fRadius);
-		Point3->fV = acos(Point3->fY / m_fRadius);
+		Point1->fV = (Point1->fY / m_fRadius)/2;
+		Point2->fV = (Point2->fY / m_fRadius)/2;
+		Point3->fV = (Point3->fY / m_fRadius)/2;
+        //Point1->fV = cosf(Point1->fY / m_fRadius)/fPI;
+        //Point2->fV = cosf(Point2->fY / m_fRadius)/fPI;
+        //Point3->fV = cosf(Point3->fY / m_fRadius)/fPI;
 	}
 }
 */
+void CTriangleTesselation::ComputeTextureCoordinates()
+{
+    static float fPI = 3.1415926f;
+    for (size_t nIterator = 0; nIterator < m_vecTriangleList[m_nArrayResult]->size(); ++nIterator)
+    {
+        CTriangle::SPoint3D* Point1 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint1();
+        CTriangle::SPoint3D* Point2 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint2();
+        CTriangle::SPoint3D* Point3 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint3();
+
+        Point1->fU = 0.5f+atan2f(Point1->fX / m_fRadius, Point1->fZ / m_fRadius)/(2.0f*fPI);
+        Point2->fU = 0.5f+atan2f(Point2->fX / m_fRadius, Point2->fZ / m_fRadius)/(2.0f*fPI);
+        Point3->fU = 0.5f+atan2f(Point3->fX / m_fRadius, Point3->fZ / m_fRadius)/(2.0f*fPI);
+        //CorrectTextureOverflowU(m_vecTriangleList[m_nArrayResult]->at(nIterator));
+        Point1->fV = 0.5f-asinf(Point1->fY / m_fRadius)/fPI;
+        Point2->fV = 0.5f-asinf(Point2->fY / m_fRadius)/fPI;
+        Point3->fV = 0.5f-asinf(Point3->fY / m_fRadius)/fPI;
+    }
+}
+
 const std::vector<CTriangle>* CTriangleTesselation::GetTriangleList() const
 {
 	return m_vecTriangleList[m_nArrayResult];
@@ -171,7 +195,7 @@ void CTriangleTesselation::GenerateTetraeder()
      */
 
     //icosahedron:
-    float phi = 1.0f / 2.0f*(1.0f + std::sqrt(5.0f));
+    float phi = 1.0f / 2.0f*(1.0f + sqrtf(5.0f));
 
     CTriangle::SPoint3D Point1;
     Point1.fX = 0.0f;

@@ -4,11 +4,13 @@ project (sphereGenerator)
 
 set(CMAKE_CXX_STANDARD 11)
 find_package(OpenGL REQUIRED)
+#find_package(SOIL REQUIRED)
 
 
 # Compile external dependencies
 add_subdirectory (external)
 
+#link_directories(/usr/local/lib)
 
 include_directories(
 	external/AntTweakBar-1.16/include/
@@ -61,8 +63,9 @@ add_executable(playground
 	#playground/SimpleFragmentShader.fragmentshader
 	#playground/SimpleVertexShader.vertexshader
 		playground/ModelObject.cpp playground/ModelObject.h)
+#libSOIL.a for loading textures
 target_link_libraries(playground
-	${ALL_LIBS}
+	${ALL_LIBS} libSOIL.a
 )
 
 # Xcode and Visual working directories

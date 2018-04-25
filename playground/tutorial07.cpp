@@ -39,6 +39,9 @@ using namespace glm;
 #include <assimp/postprocess.h>
 
 #include <iostream>
+#include "SOIL.h"
+
+GLuint loadImage_SOIL(const char * imagepath);
 
 
 int main( )
@@ -93,7 +96,7 @@ int main( )
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
-	glDepthFunc(GL_LESS); 
+	glDepthFunc(GL_LESS);
 
 	// Cull triangles which normal is not towards the camera
 	//glDisable(GL_CULL_FACE);
@@ -110,22 +113,24 @@ int main( )
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 	// Load the texture
-	GLuint Texture = loadDDS("../playground/uvmap.DDS");
-	
+	//GLuint Texture = loadDDS("../playground/uvmap.DDS");
+    GLuint Texture = loadImage_SOIL("../playground/earthmap1k.jpg");
+
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
-    TriangleTesselation.Tesselate(5);
+    TriangleTesselation.Tesselate(1);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size() ;
     //std::vector<CTriangle> tmp = *triangles;
+    //std::cout << tmp.at(0).GetPoint1()->fY << std::endl;
 
     // Read our .obj file
-	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec2> uvs; //not in use
+	//std::vector<glm::vec3> vertices;
+	//std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals; // Won't be used at the moment.
 	//bool res = loadOBJ("../playground/cube.obj", vertices, uvs, normals);
     ///bool res = loadOBJ(triangles, vertices, uvs, normals);
@@ -140,9 +145,9 @@ int main( )
 	//GLuint uvbuffer;
 	//glGenBuffers(1, &uvbuffer);
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	//glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
 
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	do{
 
@@ -168,6 +173,7 @@ int main( )
 		glBindTexture(GL_TEXTURE_2D, Texture);
 		// Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(TextureID, 0);
+        //glUniform1i( glGetUniformLocation( programID, "myTextureSampler" ), 0 );
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
@@ -177,20 +183,21 @@ int main( )
 			3,                  // size
 			GL_FLOAT,           // type
 			GL_FALSE,           // normalized?
-			sizeof(float)*3,  // stride
+			sizeof(float)*5,    // stride
 			(void*)0            // array buffer offset
 		);
 
 		// 2nd attribute buffer : UVs
+        int* pAttributPointer = reinterpret_cast<int*>(sizeof(float)*3);
 		glEnableVertexAttribArray(1);
-		//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glVertexAttribPointer(
 			1,                                // attribute
 			2,                                // size
 			GL_FLOAT,                         // type
 			GL_FALSE,                         // normalized?
-			0,                                // stride
-			(void*)0                          // array buffer offset
+            sizeof(float)*5,                  // stride
+            pAttributPointer                  // array buffer offset
 		);
 
 		// Draw the triangle !
@@ -213,6 +220,7 @@ int main( )
 	glDeleteProgram(programID);
 	glDeleteTextures(1, &Texture);
 	glDeleteVertexArrays(1, &VertexArrayID);
+    //SOIL_free_image_data(TextureID);
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
@@ -220,3 +228,110 @@ int main( )
 	return 0;
 }
 
+/*
+GLuint loadImage_SOIL(const char * imagepath){
+
+	// Create one OpenGL texture
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+
+	// "Bind" the newly created texture : all future texture functions will modify this texture
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	// Read the file, call SOIL with the right parameters
+    int width, height;
+    unsigned char* image =
+            SOIL_load_image(imagepath, &width, &height, 0, SOIL_LOAD_RGB);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, image);
+    SOIL_free_image_data(image);
+
+    if (0 == image)
+    {
+        printf("SOIL loading error: '%s'\n", SOIL_last_result());
+    }
+
+	// Nice trilinear filtering.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Return the ID of the texture we just created
+	return textureID;
+}
+ */
+
+GLuint loadImage_SOIL(const char * imagepath) {
+    GLuint texture;
+    glGenTextures(1, &texture);
+
+    int width, height;
+    unsigned char* image;
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    image = SOIL_load_image(imagepath, &width, &height, 0, SOIL_LOAD_RGB);
+
+
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    if (0 == image)
+    {
+        printf("SOIL loading error: '%s'\n", SOIL_last_result());
+    }
+    SOIL_free_image_data(image);
+    //glUniform1i(glGetUniformLocation(shaderProgram, "texKitten"), 0);
+
+
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    return texture;
+}
+
+/*
+    GLuint uvbuffer;
+	glGenBuffers(1, &uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
+    Gluint texture = SOIL_load_OGL_texture
+            (
+                    "earthheightmap.png",
+                    SOIL_LOAD_AUTO,
+                    SOIL_CREATE_NEW_ID,
+                    SOIL_FLAG_MIPMAPS | SOIL_FLAG_COMPRESS_TO_DXT
+            );
+ */
+
+/*
+ * 	// 1rst attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(
+			0,                  // attribute
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			sizeof(float)*5,    // stride
+			(void*)0            // array buffer offset
+		);
+
+		// 2nd attribute buffer : UVs
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glVertexAttribPointer(
+			1,                                // attribute
+			2,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+            sizeof(float)*2,                  // stride
+            (void*)0                          // array buffer offset
+		);
+
+ */
