@@ -91,7 +91,7 @@ int main( )
     glfwSetCursorPos(window, resolutionWidth/2, resolutionHeight/2);
 
 	// Dark blue background
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+	glClearColor(0.9f, 1.0f, 0.9f, 0.0f);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -114,14 +114,14 @@ int main( )
 
 	// Load the texture
 	//GLuint Texture = loadDDS("../playground/uvmap.DDS");
-    GLuint Texture = loadImage_SOIL("../playground/earthmap1k.jpg");
+    GLuint Texture = loadImage_SOIL("../playground/earthheightmap.png");
 
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
-    TriangleTesselation.Tesselate(1);
+    TriangleTesselation.Tesselate(7);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size() ;
@@ -147,7 +147,7 @@ int main( )
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	//glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
 
-    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	do{
 
@@ -199,6 +199,17 @@ int main( )
             sizeof(float)*5,                  // stride
             pAttributPointer                  // array buffer offset
 		);
+
+        glEnableVertexAttribArray(2);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+        glVertexAttribPointer(
+                2,                  // attribute
+                3,                  // size
+                GL_FLOAT,           // type
+                GL_TRUE,           // normalized?
+                sizeof(float)*5,    // stride
+                (void*)0            // array buffer offset
+        );
 
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, triangles->size()* 3 * 10 );
@@ -287,8 +298,8 @@ GLuint loadImage_SOIL(const char * imagepath) {
 
 
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
