@@ -9,7 +9,7 @@ class CTriangle
 public:
 	struct SPoint3D
 	{
-        glm::vec3 fPos = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 fPos = glm::vec3(0.0f, 0.0f, 0.0f); //same as normals
         glm::vec2 fUV = glm::vec2(0.0f,0.0f);
         glm::vec3 fT = glm::vec3(0.0f,0.0f,0.0f);
 		//float fX = 0.0f;

@@ -25,7 +25,7 @@ glm::vec3 position = glm::vec3( 0, 0, 3 );
 // Initial horizontal angle : toward -Z
 float horizontalAngle = 3.14f;
 // Initial vertical angle : none
-float verticalAngle = 2*3.14f;
+float verticalAngle = 0;//2*3.14f;
 // Initial Field of View
 float initialFoV = 45.0f;
 

@@ -96,6 +96,7 @@ int main( )
 	glClearColor(0.1f, 0.0f, 0.1f, 0.0f);
 
 
+
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
@@ -112,23 +113,33 @@ int main( )
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "../playground/TransformVertexShader.vertexshader", "../playground/TextureFragmentShader.fragmentshader" );
 
+    // Get a handle for our "P" uniform
+    //GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+    // Get a handle for our "MV" uniform
+    GLuint MatrixID1 = glGetUniformLocation(programID, "MV");
 	// Get a handle for our "MVP" uniform
-	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+	GLuint MatrixID2 = glGetUniformLocation(programID, "MVP");
+
 
 
     GLuint textures[2];
     glGenTextures(2, textures);
     // Load the heightmap
     //loadImage_SOIL(textures,"../playground/marsheight.png",0);
-    loadImage_SOIL(textures,"../playground/earthheightmap.png",0);
+    loadImage_SOIL(textures,"../playground/earthHeightmap8k.png",0);
 
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint HeightmapID  = glGetUniformLocation(programID, "myHeightmap");
 
     // Load the texture
     //loadImage_SOIL(textures,"../playground/marstexture.jpg",1);
-    loadImage_SOIL(textures,"../playground/earthmap1k.jpg",1);
+    loadImage_SOIL(textures,"../playground/earthDiffuse8k.jpg",1);
     GLuint TextureID  = glGetUniformLocation(programID, "myTexture");
+
+
+    //load normalmap
+    loadImage_SOIL(textures,"../playground/earthNormal8k.png",2);
+    GLuint NormalID  = glGetUniformLocation(programID, "myNormal");
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
@@ -158,7 +169,7 @@ int main( )
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	//glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
 
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	do{
 
@@ -172,12 +183,14 @@ int main( )
 		computeMatricesFromInputs();
 		glm::mat4 ProjectionMatrix = getProjectionMatrix();
 		glm::mat4 ViewMatrix = getViewMatrix();
-		glm::mat4 ModelMatrix = glm::mat4(1.0);
-		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+		//glm::mat4 ModelMatrix = glm::mat4(1.0f);
+        glm::mat4 MV =  ViewMatrix ;//* ModelMatrix;
+		glm::mat4 MVP = ProjectionMatrix * MV ;
 
-		// Send our transformation to the currently bound shader, 
+		// Send our transformation to the currently bound shader,
+        glUniformMatrix4fv(MatrixID1, 1, GL_FALSE, &MV[0][0]);
 		// in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+		glUniformMatrix4fv(MatrixID2, 1, GL_FALSE, &MVP[0][0]);
 
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);
@@ -190,6 +203,12 @@ int main( )
         glBindTexture(GL_TEXTURE_2D, textures[1]);
         // Set our "myTexture" sampler to use Texture Unit 0
         glUniform1i(TextureID, 1);
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, textures[2]);
+		// Set our "myTexture" sampler to use Texture Unit 0
+		glUniform1i(NormalID, 2);
+
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
@@ -215,7 +234,7 @@ int main( )
             sizeof(CTriangle::SPoint3D),                  // stride
             pAttributPointer                  // array buffer offset
 		);
-
+        // 2nd attribute buffer : normalen
         glEnableVertexAttribArray(2);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glVertexAttribPointer(
@@ -226,6 +245,19 @@ int main( )
             sizeof(CTriangle::SPoint3D),    // stride
             (void*)0            // array buffer offset
         );
+        // 2nd attribute buffer : tangenten
+		pAttributPointer = reinterpret_cast<int*>(sizeof(float)*6);
+		glEnableVertexAttribArray(3);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(
+				3,                  // attribute
+				3,                  // size
+				GL_FLOAT,           // type
+				GL_TRUE,           // normalized?
+				sizeof(CTriangle::SPoint3D),    // stride
+				pAttributPointer           // array buffer offset
+		);
+
 
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, triangles->size()* 3 * 10 );
