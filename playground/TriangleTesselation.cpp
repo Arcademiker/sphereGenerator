@@ -2,9 +2,7 @@
 //#include "stdafx.h"
 #include "TriangleTesselation.h"
 #include <iostream>
-// Include GLM
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+
 
 CTriangleTesselation::CTriangleTesselation(float fRadius)
 {
@@ -30,24 +28,23 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 			CTriangle::SPoint3D PointNew1;
 			CTriangle::SPoint3D PointNew2;
 			CTriangle::SPoint3D PointNew3;
+
 			CTriangle::SPoint3D Point1 = *m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint1();
 			CTriangle::SPoint3D Point2 = *m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint2();
 			CTriangle::SPoint3D Point3 = *m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint3();
-			PointNew1.fX = (Point2.fX + Point3.fX) / 2.0f;
-			PointNew1.fY = (Point2.fY + Point3.fY) / 2.0f;
-			PointNew1.fZ = (Point2.fZ + Point3.fZ) / 2.0f;
-			PointNew1.Normalize();
-			PointNew1 = PointNew1 * m_fRadius;
-			PointNew2.fX = (Point3.fX + Point1.fX) / 2.0f;
-			PointNew2.fY = (Point3.fY + Point1.fY) / 2.0f;
-			PointNew2.fZ = (Point3.fZ + Point1.fZ) / 2.0f;
-			PointNew2.Normalize();
-			PointNew2 = PointNew2 * m_fRadius;
-			PointNew3.fX = (Point1.fX + Point2.fX) / 2.0f;
-			PointNew3.fY = (Point1.fY + Point2.fY) / 2.0f;
-			PointNew3.fZ = (Point1.fZ + Point2.fZ) / 2.0f;
-			PointNew3.Normalize();
-			PointNew3 = PointNew3 * m_fRadius;
+
+            PointNew1.fPos = (Point2.fPos + Point3.fPos) / 2.0f;
+            PointNew1.fPos = glm::normalize(PointNew1.fPos);
+            PointNew1.fPos = PointNew1.fPos * m_fRadius;
+
+            PointNew2.fPos = (Point3.fPos + Point1.fPos) / 2.0f;
+            PointNew2.fPos = glm::normalize(PointNew2.fPos);
+            PointNew2.fPos = PointNew2.fPos * m_fRadius;
+
+            PointNew3.fPos = (Point1.fPos + Point2.fPos) / 2.0f;
+            PointNew3.fPos = glm::normalize(PointNew3.fPos);
+            PointNew3.fPos = PointNew3.fPos * m_fRadius;
+
 			m_vecTriangleList[1 - m_nArrayResult]->push_back(CTriangle(Point1, PointNew2, PointNew3));
 			m_vecTriangleList[1 - m_nArrayResult]->push_back(CTriangle(Point2, PointNew3, PointNew1));
 			m_vecTriangleList[1 - m_nArrayResult]->push_back(CTriangle(Point3, PointNew1, PointNew2));
@@ -56,6 +53,7 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 		m_nArrayResult = 1 - m_nArrayResult;
 	}
 	ComputeTextureCoordinates();
+    //ComputeTangentBitangent();
 }
 
 /*
@@ -85,42 +83,42 @@ void CorrectTextureOverflowU(CTriangle& Triangle)
 	CTriangle::SPoint3D* Point2 = Triangle.GetPoint2();
 	CTriangle::SPoint3D* Point3 = Triangle.GetPoint3();
 
-	if (fabsf(Point1->fU - Point2->fU) > 0.5)
+	if (fabsf(Point1->fUV.x - Point2->fUV.x) > 0.5)
 	{
-		if (Point1->fU < Point2->fU) 
+		if (Point1->fUV.x < Point2->fUV.x)
 		{	
-			Point1->fU += 1.0f;//2.0f * fPI;
+			Point1->fUV.x += 1.0f;//2.0f * fPI;
 		}
 		else
 		{
-			Point2->fU += 1.0f;//2.0f * fPI;
+			Point2->fUV.x += 1.0f;//2.0f * fPI;
 		}
 	}
-	if (fabsf(Point2->fU - Point3->fU) > 0.5)
+	if (fabsf(Point2->fUV.x - Point3->fUV.x) > 0.5)
 	{
-        //std::cout << "2--3\t(" << Point2->fU << "," << Point2->fV << ")-\t-(" << Point3->fU << "," << Point3->fV << ")" << std::endl;;
-		if (Point2->fU < Point3->fU)
+        //std::cout << "2--3\t(" << Point2->fUV.x << "," << Point2->fV << ")-\t-(" << Point3->fUV.x << "," << Point3->fV << ")" << std::endl;;
+		if (Point2->fUV.x < Point3->fUV.x)
 		{
-			Point2->fU += 1.0f;//2.0f * fPI;
+			Point2->fUV.x += 1.0f;//2.0f * fPI;
 		}
 		else
 		{
-			Point3->fU += 1.0f;//2.0f * fPI;
+			Point3->fUV.x += 1.0f;//2.0f * fPI;
 		}
 	}
-    if (fabsf(Point1->fU - Point3->fU) > 0.5)
+    if (fabsf(Point1->fUV.x - Point3->fUV.x) > 0.5)
     {
-        //std::cout << "1--3\t(" << Point1->fU << "," << Point1->fV << ")-\t-(" << Point3->fU << "," << Point3->fV << ")" << std::endl;;
-        if (Point1->fU < Point3->fU)
+        //std::cout << "1--3\t(" << Point1->fUV.x << "," << Point1->fV << ")-\t-(" << Point3->fUV.x << "," << Point3->fV << ")" << std::endl;;
+        if (Point1->fUV.x < Point3->fUV.x)
         {
-            Point1->fU += 1.0f;//2.0f * fPI;
+            Point1->fUV.x += 1.0f;//2.0f * fPI;
         }
         else
         {
-            Point3->fU += 1.0f;//2.0f * fPI;
+            Point3->fUV.x += 1.0f;//2.0f * fPI;
         }
     }
-    //std::cout << "1--2\t(" << Point1->fU << "," << Point1->fV << ")-\t-(" << Point2->fU << "," << Point2->fV << ")" << std::endl;
+    //std::cout << "1--2\t(" << Point1->fUV.x << "," << Point1->fV << ")-\t-(" << Point2->fUV.x << "," << Point2->fV << ")" << std::endl;
 }
 
 /*
@@ -153,13 +151,13 @@ void CTriangleTesselation::ComputeTextureCoordinates()
         CTriangle::SPoint3D* Point1 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint1();
         CTriangle::SPoint3D* Point2 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint2();
         CTriangle::SPoint3D* Point3 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint3();
-        Point1->fU = 0.5f+atan2f(Point1->fX / m_fRadius, Point1->fZ / m_fRadius)/(2.0f*fPI);
-        Point2->fU = 0.5f+atan2f(Point2->fX / m_fRadius, Point2->fZ / m_fRadius)/(2.0f*fPI);
-        Point3->fU = 0.5f+atan2f(Point3->fX / m_fRadius, Point3->fZ / m_fRadius)/(2.0f*fPI);
+        Point1->fUV.x = 0.5f+atan2f(Point1->fPos.x / m_fRadius, Point1->fPos.z / m_fRadius)/(2.0f*fPI);
+        Point2->fUV.x = 0.5f+atan2f(Point2->fPos.x / m_fRadius, Point2->fPos.z / m_fRadius)/(2.0f*fPI);
+        Point3->fUV.x = 0.5f+atan2f(Point3->fPos.x / m_fRadius, Point3->fPos.z / m_fRadius)/(2.0f*fPI);
         CorrectTextureOverflowU(m_vecTriangleList[m_nArrayResult]->at(nIterator));
-        Point1->fV = 0.5f-asinf(Point1->fY / m_fRadius)/fPI;
-        Point2->fV = 0.5f-asinf(Point2->fY / m_fRadius)/fPI;
-        Point3->fV = 0.5f-asinf(Point3->fY / m_fRadius)/fPI;
+        Point1->fUV.y = 0.5f-asinf(Point1->fPos.y / m_fRadius)/fPI;
+        Point2->fUV.y = 0.5f-asinf(Point2->fPos.y / m_fRadius)/fPI;
+        Point3->fUV.y = 0.5f-asinf(Point3->fPos.y / m_fRadius)/fPI;
     }
 }
 
@@ -171,31 +169,25 @@ void CTriangleTesselation::ComputeTangentBitangent()
         CTriangle::SPoint3D *Point2 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint2();
         CTriangle::SPoint3D *Point3 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint3();
 
-        if(Point1->fX == 0.0f && Point1->fZ == 0.0f)
+        if(Point1->fPos.x == 0.0f && Point1->fPos.z == 0.0f)
         {
-            Point1->fTx = 0;
-            Point1->fTy = 0;
-            Point1->fTz = 1;
+            Point1->fT = glm::vec3(0,0,1);
         }
         else
         {
             ComputePointTangent(Point1);
         }
-        if(Point2->fX == 0.0f && Point2->fZ == 0.0f)
+        if(Point2->fPos.x == 0.0f && Point2->fPos.z == 0.0f)
         {
-            Point2->fTx = 0;
-            Point2->fTy = 0;
-            Point2->fTz = 1;
+            Point2->fT = glm::vec3(0,0,1);
         }
         else
         {
             ComputePointTangent(Point2);
         }
-        if(Point3->fX == 0.0f && Point3->fZ == 0.0f)
+        if(Point3->fPos.x == 0.0f && Point3->fPos.z == 0.0f)
         {
-            Point3->fTx = 0;
-            Point3->fTy = 0;
-            Point3->fTz = 1;
+            Point3->fT = glm::vec3(0,0,1);
         }
         else
         {
@@ -205,12 +197,10 @@ void CTriangleTesselation::ComputeTangentBitangent()
 }
 
 void CTriangleTesselation::ComputePointTangent(CTriangle::SPoint3D *Point) {
-    glm::vec3 normal = glm::vec3(Point->fX, Point->fY, Point->fZ);
+    glm::vec3 normal = Point->fPos;
     glm::vec3 tangent = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), normal);
-    glm::normalize(tangent);
-    Point->fTx = tangent.x;
-    Point->fTy = tangent.y;
-    Point->fTz = tangent.z;
+    tangent = glm::normalize(tangent);
+    Point->fT = tangent;
 }
 
 
@@ -266,92 +256,93 @@ void CTriangleTesselation::GenerateTetraeder()
     float phi = 1.0f / 2.0f*(1.0f + sqrtf(5.0f));
 
     CTriangle::SPoint3D Point1;
-    Point1.fX = 0.0f;
-    Point1.fY = 1.0f;
-    Point1.fZ = phi;
-    Point1.Normalize();
-    Point1 = Point1 * m_fRadius;
+    //Point1.fPos(0.0f,1.0f,phi);
+    Point1.fPos.x = 0.0f;
+    Point1.fPos.y = 1.0f;
+    Point1.fPos.z = phi;
+    Point1.fPos = glm::normalize(Point1.fPos);
+    Point1.fPos = Point1.fPos * m_fRadius;
 
     //rim+
     CTriangle::SPoint3D Point2;
-    Point2.fX = 0.0f;
-    Point2.fY = 1.0f;
-    Point2.fZ = -phi;
-    Point2.Normalize();
-    Point2 = Point2 * m_fRadius;
+    Point2.fPos.x = 0.0f;
+    Point2.fPos.y = 1.0f;
+    Point2.fPos.z = -phi;
+    Point2.fPos = glm::normalize(Point2.fPos);
+    Point2.fPos = Point2.fPos * m_fRadius;
 
     CTriangle::SPoint3D Point3;
-    Point3.fX = 0.0f;
-    Point3.fY = -1.0f;
-    Point3.fZ = phi;
-    Point3.Normalize();
-    Point3 = Point3 * m_fRadius;
+    Point3.fPos.x = 0.0f;
+    Point3.fPos.y = -1.0f;
+    Point3.fPos.z = phi;
+    Point3.fPos = glm::normalize(Point3.fPos);
+    Point3.fPos = Point3.fPos * m_fRadius;
 
     //rim+
     CTriangle::SPoint3D Point4;
-    Point4.fX = 0.0f;
-    Point4.fY = -1.0f;
-    Point4.fZ = -phi;
-    Point4.Normalize();
-    Point4 = Point4 * m_fRadius;
+    Point4.fPos.x = 0.0f;
+    Point4.fPos.y = -1.0f;
+    Point4.fPos.z = -phi;
+    Point4.fPos = glm::normalize(Point4.fPos);
+    Point4.fPos = Point4.fPos * m_fRadius;
 
     //rim+
     CTriangle::SPoint3D Point5;
-    Point5.fX = 1.0f;
-    Point5.fY = phi;
-    Point5.fZ = 0.0f;
-    Point5.Normalize();
-    Point5 = Point5 * m_fRadius;
+    Point5.fPos.x = 1.0f;
+    Point5.fPos.y = phi;
+    Point5.fPos.z = 0.0f;
+    Point5.fPos = glm::normalize(Point5.fPos);
+    Point5.fPos = Point5.fPos * m_fRadius;
 
     //rim+
     CTriangle::SPoint3D Point6;
-    Point6.fX = 1.0f;
-    Point6.fY = -phi;
-    Point6.fZ = 0.0f;
-    Point6.Normalize();
-    Point6 = Point6 * m_fRadius;
+    Point6.fPos.x = 1.0f;
+    Point6.fPos.y = -phi;
+    Point6.fPos.z = 0.0f;
+    Point6.fPos = glm::normalize(Point6.fPos);
+    Point6.fPos = Point6.fPos * m_fRadius;
 
     CTriangle::SPoint3D Point7;
-    Point7.fX = -1.0f;
-    Point7.fY = phi;
-    Point7.fZ = 0.0f;
-    Point7.Normalize();
-    Point7 = Point7 * m_fRadius;
+    Point7.fPos.x = -1.0f;
+    Point7.fPos.y = phi;
+    Point7.fPos.z = 0.0f;
+    Point7.fPos = glm::normalize(Point7.fPos);
+    Point7.fPos = Point7.fPos * m_fRadius;
 
     CTriangle::SPoint3D Point8;
-    Point8.fX = -1.0f;
-    Point8.fY = -phi;
-    Point8.fZ = 0.0f;
-    Point8.Normalize();
-    Point8 = Point8 * m_fRadius;
+    Point8.fPos.x = -1.0f;
+    Point8.fPos.y = -phi;
+    Point8.fPos.z = 0.0f;
+    Point8.fPos = glm::normalize(Point8.fPos);
+    Point8.fPos = Point8.fPos * m_fRadius;
 
     CTriangle::SPoint3D Point9;
-    Point9.fX = phi;
-    Point9.fY = 0.0f;
-    Point9.fZ = 1.0f;
-    Point9.Normalize();
-    Point9 = Point9 * m_fRadius;
+    Point9.fPos.x = phi;
+    Point9.fPos.y = 0.0f;
+    Point9.fPos.z = 1.0f;
+    Point9.fPos = glm::normalize(Point9.fPos);
+    Point9.fPos = Point9.fPos * m_fRadius;
 
     CTriangle::SPoint3D PointA;
-    PointA.fX = -phi;
-    PointA.fY = 0.0f;
-    PointA.fZ = 1.0f;
-    PointA.Normalize();
-    PointA = PointA * m_fRadius;
+    PointA.fPos.x = -phi;
+    PointA.fPos.y = 0.0f;
+    PointA.fPos.z = 1.0f;
+    PointA.fPos = glm::normalize(PointA.fPos);
+    PointA.fPos = PointA.fPos * m_fRadius;
 
     CTriangle::SPoint3D PointB;
-    PointB.fX = phi;
-    PointB.fY = 0.0f;
-    PointB.fZ = -1.0f;
-    PointB.Normalize();
-    PointB = PointB * m_fRadius;
+    PointB.fPos.x = phi;
+    PointB.fPos.y = 0.0f;
+    PointB.fPos.z = -1.0f;
+    PointB.fPos = glm::normalize(PointB.fPos);
+    PointB.fPos = PointB.fPos * m_fRadius;
 
     CTriangle::SPoint3D PointC;
-    PointC.fX = -phi;
-    PointC.fY = 0.0f;
-    PointC.fZ = -1.0f;
-    PointC.Normalize();
-    PointC = PointC * m_fRadius;
+    PointC.fPos.x = -phi;
+    PointC.fPos.y = 0.0f;
+    PointC.fPos.z = -1.0f;
+    PointC.fPos = glm::normalize(PointC.fPos);
+    PointC.fPos = PointC.fPos * m_fRadius;
 
     //northpol
     m_vecTriangleList[0]->push_back(CTriangle(Point7, Point5, Point1));

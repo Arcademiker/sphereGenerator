@@ -119,18 +119,20 @@ int main( )
     GLuint textures[2];
     glGenTextures(2, textures);
     // Load the heightmap
-    loadImage_SOIL(textures,"../playground/marsheight.png",0);
+    //loadImage_SOIL(textures,"../playground/marsheight.png",0);
+    loadImage_SOIL(textures,"../playground/earthheightmap.png",0);
 
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint HeightmapID  = glGetUniformLocation(programID, "myHeightmap");
 
     // Load the texture
-    loadImage_SOIL(textures,"../playground/marstexture.jpg",1);
+    //loadImage_SOIL(textures,"../playground/marstexture.jpg",1);
+    loadImage_SOIL(textures,"../playground/earthmap1k.jpg",1);
     GLuint TextureID  = glGetUniformLocation(programID, "myTexture");
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
-    TriangleTesselation.Tesselate(7);
+    TriangleTesselation.Tesselate(5);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size() ;
@@ -156,7 +158,7 @@ int main( )
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	//glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
 
-    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	do{
 

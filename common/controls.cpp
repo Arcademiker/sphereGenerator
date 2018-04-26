@@ -102,3 +102,26 @@ void computeMatricesFromInputs(){
 	// For the next frame, the "last time" will be "now"
 	lastTime = currentTime;
 }
+
+
+/*glfwPollEvents();
+        int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
+        if (1 == present)
+        {
+            glm::vec3 modelScale = (vecMODELS[0]->getMaxValues() - vecMODELS[0]->getMinValues());
+            float fMoveSpeed = std::max(modelScale.x, modelScale.y);
+            fMoveSpeed = std::max(fMoveSpeed, modelScale.z);
+            fMoveSpeed = fMoveSpeed * static_cast<float>(dTimeDiff) / 10.0f;
+
+
+            int axisCount;
+            const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axisCount);
+            //std::cout << axisCount << std::endl;
+            if (abs(axes[0]) > 0.01f) { pCamera->Translate(glm::vec3(-1.0f * axes[0] * fMoveSpeed, 0.0f, 0.0f)); }
+            if (abs(axes[1]) > 0.01f) { pCamera->Translate(glm::vec3(0.0f, 0.0f, 1.0f * axes[1] * fMoveSpeed)); }
+            if (abs(axes[2]) > 0.01f) { pCamera->Rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.5f * axes[2] * fMoveSpeed * 10.0f); }
+            if (abs(axes[3]) > 0.01f) { pCamera->AddPitch(-0.5f * axes[3] * fMoveSpeed * 10.0f); }
+            if (abs(axes[4] + 1.0f) > 0.01f) { pCamera->Translate(glm::vec3(0.0f, 1.0f * (axes[4] + 1.0f) * fMoveSpeed, 0.0f)); }
+            if (abs(axes[5] + 1.0f) > 0.01f) { pCamera->Translate(glm::vec3(0.0f, -1.0f * (axes[5] + 1.0f) * fMoveSpeed, 0.0f)); }
+        }
+*/
