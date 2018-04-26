@@ -246,16 +246,16 @@ int main( )
             (void*)0            // array buffer offset
         );
         // 2nd attribute buffer : tangenten
-		pAttributPointer = reinterpret_cast<int*>(sizeof(float)*6);
+		pAttributPointer = reinterpret_cast<int*>(sizeof(float)*5);
 		glEnableVertexAttribArray(3);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glVertexAttribPointer(
-				3,                  // attribute
-				3,                  // size
-				GL_FLOAT,           // type
-				GL_TRUE,           // normalized?
-				sizeof(CTriangle::SPoint3D),    // stride
-				pAttributPointer           // array buffer offset
+            3,                  // attribute
+            3,                  // size
+            GL_FLOAT,           // type
+            GL_TRUE,           // normalized?
+            sizeof(CTriangle::SPoint3D),    // stride
+            pAttributPointer           // array buffer offset
 		);
 
 

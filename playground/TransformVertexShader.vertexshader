@@ -19,7 +19,7 @@ out VS_OUT
 // Values that stay constant for the whole mesh.
 uniform mat4 MV;
 uniform mat4 MVP;
-uniform vec3 light_pos = vec3(0.0, 0.0, 10.0);
+uniform vec3 light_pos = vec3(0.0, 0.0, 100.0);
 
 uniform sampler2D myTexture;
 uniform sampler2D myHeightmap;
@@ -33,25 +33,20 @@ void main(){
 
     vec3 B = cross(N,T);
 
-    vec3 L = light_pos - P.xyz;
+    vec3 L = (MV* vec4(light_pos,1.0)).xyz - P.xyz;
     vec3 V = -P.xyz;
     vs_out.lightDir = normalize(vec3(dot(L, T), dot(L, B), dot(L, N)));
     //vs_out.lightDir = vec3(0,1,1);
 
-    vs_out.eyeDir =   normalize(vec3(dot(V, T), dot(V, B), dot(V, N)));
+    vs_out.eyeDir   = normalize(vec3(dot(V, T), dot(V, B), dot(V, N)));
 
     vs_out.UV = vertexUV;
 
     //gl_Position = proj_matrix*P
 
 
-
-
 	// Output position of the vertex, in clip space : MVP * position
+	gl_Position =  MVP * vec4((vertexPosition_modelspace + 0.02 * normal * texture( myHeightmap, vertexUV ).x),1);
 
-	gl_Position =  MVP * vec4((vertexPosition_modelspace + 0.01 * normal * texture( myHeightmap, vertexUV ).x),1);
-	
-	// UV of the vertex. No special space for this one.
-	//UV =  vertexUV; //vertexPosition_modelspace;
 }
 
