@@ -16,6 +16,8 @@ private:
 
 	void GenerateTetraeder();
 	void ComputeTextureCoordinates();
+    void ComputeTangentBitangent();
+    void ComputePointTangent(CTriangle::SPoint3D *Point);
 
 	size_t m_nArrayResult = 0;
 	float m_fRadius = 1.0f;

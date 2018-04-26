@@ -11,6 +11,10 @@ public:
 		float fZ = 0.0f;
 		float fU = 0.0f;
 		float fV = 0.0f;
+		float fTx = 0.0f;
+        float fTy = 0.0f;
+        float fTz = 0.0f;
+        //float fB = 0.0f;
 		void Normalize()
 		{
 			float length = sqrtf(fX*fX + fY*fY + fZ*fZ);

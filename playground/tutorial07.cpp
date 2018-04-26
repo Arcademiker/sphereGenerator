@@ -156,7 +156,7 @@ int main( )
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	//glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
 
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	do{
 
@@ -197,7 +197,7 @@ int main( )
 			3,                  // size
 			GL_FLOAT,           // type
 			GL_FALSE,           // normalized?
-			sizeof(float)*5,    // stride
+			sizeof(CTriangle::SPoint3D),    // stride
 			(void*)0            // array buffer offset
 		);
 
@@ -210,19 +210,19 @@ int main( )
 			2,                                // size
 			GL_FLOAT,                         // type
 			GL_FALSE,                         // normalized?
-            sizeof(float)*5,                  // stride
+            sizeof(CTriangle::SPoint3D),                  // stride
             pAttributPointer                  // array buffer offset
 		);
 
         glEnableVertexAttribArray(2);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
         glVertexAttribPointer(
-                2,                  // attribute
-                3,                  // size
-                GL_FLOAT,           // type
-                GL_TRUE,           // normalized?
-                sizeof(float)*5,    // stride
-                (void*)0            // array buffer offset
+            2,                  // attribute
+            3,                  // size
+            GL_FLOAT,           // type
+            GL_TRUE,           // normalized?
+            sizeof(CTriangle::SPoint3D),    // stride
+            (void*)0            // array buffer offset
         );
 
 		// Draw the triangle !
@@ -271,7 +271,7 @@ void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texInde
         printf("SOIL loading error: '%s'\n", SOIL_last_result());
     }
     SOIL_free_image_data(image);
-    //glUniform1i(glGetUniformLocation(shaderProgram, "texKitten"), 0);
+    //glUniform1i(glGetUniformLocation(shaderProgram, "myTexture"), 0);
 
     glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
@@ -280,8 +280,6 @@ void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texInde
 
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     //glGenerateMipmap(GL_TEXTURE_2D);
-
-    //return textures;
 }
 
 /*

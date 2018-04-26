@@ -2,6 +2,9 @@
 //#include "stdafx.h"
 #include "TriangleTesselation.h"
 #include <iostream>
+// Include GLM
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 CTriangleTesselation::CTriangleTesselation(float fRadius)
 {
@@ -150,7 +153,6 @@ void CTriangleTesselation::ComputeTextureCoordinates()
         CTriangle::SPoint3D* Point1 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint1();
         CTriangle::SPoint3D* Point2 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint2();
         CTriangle::SPoint3D* Point3 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint3();
-
         Point1->fU = 0.5f+atan2f(Point1->fX / m_fRadius, Point1->fZ / m_fRadius)/(2.0f*fPI);
         Point2->fU = 0.5f+atan2f(Point2->fX / m_fRadius, Point2->fZ / m_fRadius)/(2.0f*fPI);
         Point3->fU = 0.5f+atan2f(Point3->fX / m_fRadius, Point3->fZ / m_fRadius)/(2.0f*fPI);
@@ -160,6 +162,57 @@ void CTriangleTesselation::ComputeTextureCoordinates()
         Point3->fV = 0.5f-asinf(Point3->fY / m_fRadius)/fPI;
     }
 }
+
+void CTriangleTesselation::ComputeTangentBitangent()
+{
+    for (size_t nIterator = 0; nIterator < m_vecTriangleList[m_nArrayResult]->size(); ++nIterator)
+    {
+        CTriangle::SPoint3D *Point1 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint1();
+        CTriangle::SPoint3D *Point2 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint2();
+        CTriangle::SPoint3D *Point3 = m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint3();
+
+        if(Point1->fX == 0.0f && Point1->fZ == 0.0f)
+        {
+            Point1->fTx = 0;
+            Point1->fTy = 0;
+            Point1->fTz = 1;
+        }
+        else
+        {
+            ComputePointTangent(Point1);
+        }
+        if(Point2->fX == 0.0f && Point2->fZ == 0.0f)
+        {
+            Point2->fTx = 0;
+            Point2->fTy = 0;
+            Point2->fTz = 1;
+        }
+        else
+        {
+            ComputePointTangent(Point2);
+        }
+        if(Point3->fX == 0.0f && Point3->fZ == 0.0f)
+        {
+            Point3->fTx = 0;
+            Point3->fTy = 0;
+            Point3->fTz = 1;
+        }
+        else
+        {
+            ComputePointTangent(Point3);
+        }
+    }
+}
+
+void CTriangleTesselation::ComputePointTangent(CTriangle::SPoint3D *Point) {
+    glm::vec3 normal = glm::vec3(Point->fX, Point->fY, Point->fZ);
+    glm::vec3 tangent = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), normal);
+    glm::normalize(tangent);
+    Point->fTx = tangent.x;
+    Point->fTy = tangent.y;
+    Point->fTz = tangent.z;
+}
+
 
 const std::vector<CTriangle>* CTriangleTesselation::GetTriangleList() const
 {
