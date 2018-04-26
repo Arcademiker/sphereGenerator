@@ -41,7 +41,7 @@ using namespace glm;
 #include <iostream>
 #include "SOIL.h"
 
-GLuint loadImage_SOIL(const char * imagepath);
+void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texIndex);
 
 
 int main( )
@@ -90,8 +90,11 @@ int main( )
     glfwPollEvents();
     glfwSetCursorPos(window, resolutionWidth/2, resolutionHeight/2);
 
-	// Dark blue background
-	glClearColor(0.9f, 1.0f, 0.9f, 0.0f);
+	// Light background
+	//glClearColor(0.9f, 1.0f, 0.9f, 0.0f);
+	// Dark background
+	glClearColor(0.1f, 0.0f, 0.1f, 0.0f);
+
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -112,12 +115,18 @@ int main( )
 	// Get a handle for our "MVP" uniform
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
-	// Load the texture
-	//GLuint Texture = loadDDS("../playground/uvmap.DDS");
-    GLuint Texture = loadImage_SOIL("../playground/earthheightmap.png");
+
+    GLuint textures[2];
+    glGenTextures(2, textures);
+    // Load the heightmap
+    loadImage_SOIL(textures,"../playground/marsheight.png",0);
 
 	// Get a handle for our "myTextureSampler" uniform
-	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
+	GLuint HeightmapID  = glGetUniformLocation(programID, "myHeightmap");
+
+    // Load the texture
+    loadImage_SOIL(textures,"../playground/marstexture.jpg",1);
+    GLuint TextureID  = glGetUniformLocation(programID, "myTexture");
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
@@ -170,10 +179,15 @@ int main( )
 
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, Texture);
-		// Set our "myTextureSampler" sampler to use Texture Unit 0
-		glUniform1i(TextureID, 0);
+		glBindTexture(GL_TEXTURE_2D, textures[0]);
+		// Set our "myHeightmap" sampler to use Texture Unit 0
+		glUniform1i(HeightmapID, 0);
         //glUniform1i( glGetUniformLocation( programID, "myTextureSampler" ), 0 );
+        // Bind our texture in Texture Unit 1
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, textures[1]);
+        // Set our "myTexture" sampler to use Texture Unit 0
+        glUniform1i(TextureID, 1);
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
@@ -229,7 +243,7 @@ int main( )
 	glDeleteBuffers(1, &vertexbuffer);
 	//glDeleteBuffers(1, &uvbuffer);
 	glDeleteProgram(programID);
-	glDeleteTextures(1, &Texture);
+	glDeleteTextures(1, textures);
 	glDeleteVertexArrays(1, &VertexArrayID);
     //SOIL_free_image_data(TextureID);
 
@@ -238,6 +252,80 @@ int main( )
 
 	return 0;
 }
+
+
+
+void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texIndex) {
+
+    int width, height;
+    unsigned char* image;
+
+    glActiveTexture(GL_TEXTURE0 + texIndex);
+    glBindTexture(GL_TEXTURE_2D, textures[texIndex]);
+
+    image = SOIL_load_image(imagepath, &width, &height, 0, SOIL_LOAD_RGB);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    if (0 == image)
+    {
+        printf("SOIL loading error: '%s'\n", SOIL_last_result());
+    }
+    SOIL_free_image_data(image);
+    //glUniform1i(glGetUniformLocation(shaderProgram, "texKitten"), 0);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    //glGenerateMipmap(GL_TEXTURE_2D);
+
+    //return textures;
+}
+
+/*
+    GLuint uvbuffer;
+	glGenBuffers(1, &uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
+    Gluint texture = SOIL_load_OGL_texture
+            (
+                    "earthheightmap.png",
+                    SOIL_LOAD_AUTO,
+                    SOIL_CREATE_NEW_ID,
+                    SOIL_FLAG_MIPMAPS | SOIL_FLAG_COMPRESS_TO_DXT
+            );
+ */
+
+/*//GLuint Texture = loadDDS("../playground/uvmap.DDS");
+ *
+ *
+ * 	// 1rst attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(
+			0,                  // attribute
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			sizeof(float)*5,    // stride
+			(void*)0            // array buffer offset
+		);
+
+		// 2nd attribute buffer : UVs
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glVertexAttribPointer(
+			1,                                // attribute
+			2,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+            sizeof(float)*2,                  // stride
+            (void*)0                          // array buffer offset
+		);
+
+ */
 
 /*
 GLuint loadImage_SOIL(const char * imagepath){
@@ -272,77 +360,4 @@ GLuint loadImage_SOIL(const char * imagepath){
 	// Return the ID of the texture we just created
 	return textureID;
 }
- */
-
-GLuint loadImage_SOIL(const char * imagepath) {
-    GLuint texture;
-    glGenTextures(1, &texture);
-
-    int width, height;
-    unsigned char* image;
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    image = SOIL_load_image(imagepath, &width, &height, 0, SOIL_LOAD_RGB);
-
-
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-    if (0 == image)
-    {
-        printf("SOIL loading error: '%s'\n", SOIL_last_result());
-    }
-    SOIL_free_image_data(image);
-    //glUniform1i(glGetUniformLocation(shaderProgram, "texKitten"), 0);
-
-
-
-    glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    return texture;
-}
-
-/*
-    GLuint uvbuffer;
-	glGenBuffers(1, &uvbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
-    Gluint texture = SOIL_load_OGL_texture
-            (
-                    "earthheightmap.png",
-                    SOIL_LOAD_AUTO,
-                    SOIL_CREATE_NEW_ID,
-                    SOIL_FLAG_MIPMAPS | SOIL_FLAG_COMPRESS_TO_DXT
-            );
- */
-
-/*
- * 	// 1rst attribute buffer : vertices
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer(
-			0,                  // attribute
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			sizeof(float)*5,    // stride
-			(void*)0            // array buffer offset
-		);
-
-		// 2nd attribute buffer : UVs
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-		glVertexAttribPointer(
-			1,                                // attribute
-			2,                                // size
-			GL_FLOAT,                         // type
-			GL_FALSE,                         // normalized?
-            sizeof(float)*2,                  // stride
-            (void*)0                          // array buffer offset
-		);
-
  */
