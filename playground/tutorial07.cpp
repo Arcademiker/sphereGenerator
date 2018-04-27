@@ -120,6 +120,8 @@ int main( )
 	// Get a handle for our "MVP" uniform
 	GLuint MatrixID2 = glGetUniformLocation(programID, "MVP");
 
+	GLuint MatrixID3 = glGetUniformLocation(programID, "ViewMatrix");
+
 
 
     GLuint textures[4];
@@ -147,7 +149,7 @@ int main( )
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
-    TriangleTesselation.Tesselate(5);
+    TriangleTesselation.Tesselate(7);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size() ;
@@ -194,10 +196,14 @@ int main( )
         glm::mat4 MV =  ViewMatrix * ModelMatrix;
 		glm::mat4 MVP = ProjectionMatrix * MV ;
 
+
+
 		// Send our transformation to the currently bound shader,
         glUniformMatrix4fv(MatrixID1, 1, GL_FALSE, &MV[0][0]);
 		// in the "MVP" uniform
 		glUniformMatrix4fv(MatrixID2, 1, GL_FALSE, &MVP[0][0]);
+
+		glUniformMatrix4fv(MatrixID3, 1, GL_FALSE, &ViewMatrix[0][0]);
 
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);

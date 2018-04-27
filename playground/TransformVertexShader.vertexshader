@@ -20,6 +20,7 @@ out VS_OUT
 uniform mat4 MV;
 uniform mat4 MVP;
 uniform vec3 light_pos = vec3(0.0, 0.0, 100.0);
+uniform mat4 ViewMatrix;
 
 //uniform sampler2D myTexture;
 uniform sampler2D myHeightmap;
@@ -33,7 +34,8 @@ void main(){
 
     vec3 B = cross(N,T);
 
-    vec3 L = (MV* vec4(light_pos,1.0)).xyz - P.xyz;
+    //dont move lightsource with cam
+    vec3 L = (ViewMatrix* vec4(light_pos,1.0)).xyz - P.xyz;
     vec3 V = -P.xyz;
     vs_out.lightDir = normalize(vec3(dot(L, T), dot(L, B), dot(L, N)));
     //vs_out.lightDir = vec3(0,1,1);
