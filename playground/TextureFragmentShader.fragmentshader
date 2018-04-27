@@ -15,25 +15,28 @@ out vec4 color;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTexture;
-uniform sampler2D myHeightmap;
+//uniform sampler2D myHeightmap;
 uniform sampler2D myNormal;
+uniform sampler2D mySpecular;
 
 void main(){
     vec3 V = normalize(fs_in.eyeDir);
     vec3 L = normalize(fs_in.lightDir);
 
-    vec3 N = normalize(texture(myNormal, fs_in.UV).rgb * 2.0 - vec3(1.0,1.0,1.0));
+    vec2 UVfrag = fs_in.UV;// * 3;
+
+    vec3 N = normalize(texture(myNormal, UVfrag).rgb * 2.0 - vec3(1.0,1.0,1.0));
     vec3 R = reflect(-L,N); // reflect(-L,N) = -L - 2.0 * dot(N, -L) * N;
 
-    vec3 diffuse_albedo = texture(myTexture, fs_in.UV).rgb;
+    vec3 diffuse_albedo = texture(myTexture, UVfrag).rgb;
     vec3 diffuse = clamp(dot(N,L), 0.0, 1.0) * diffuse_albedo;
     //vec3 diffuse = max(dot(N,L), 0.0) * diffuse_albedo;
     //Uncomment this to turn off diffuse shading
     //diffuse = vec3(0.0);
 
-    vec3 specular_albedo = vec3(1.0);
+    vec3 specular_albedo = vec3(1.0,0.9,0.9);
 
-    vec3 specular = pow(clamp(dot(R, V),0.0,1.0), 5.0) * specular_albedo;
+    vec3 specular = pow(clamp(dot(R, V),0.0,1.0), 7.0) * specular_albedo *  texture(mySpecular, UVfrag).xyz; //text
 
     //vec3 specular = max(pow(dot(R, V), 5.0), 0.0) * specular_albedo;
     //specular = vec3(0.0);

@@ -122,8 +122,8 @@ int main( )
 
 
 
-    GLuint textures[2];
-    glGenTextures(2, textures);
+    GLuint textures[4];
+    glGenTextures(4, textures);
     // Load the heightmap
     //loadImage_SOIL(textures,"../playground/marsheight.png",0);
     loadImage_SOIL(textures,"../playground/earthHeightmap8k.png",0);
@@ -140,6 +140,10 @@ int main( )
     //load normalmap
     loadImage_SOIL(textures,"../playground/earthNormal8k.png",2);
     GLuint NormalID  = glGetUniformLocation(programID, "myNormal");
+
+	//load specular
+	loadImage_SOIL(textures,"../playground/earthSpecular28k.png",3);
+	GLuint SpecularID  = glGetUniformLocation(programID, "mySpecular");
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
@@ -170,7 +174,7 @@ int main( )
 	//glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
 
     //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
+    glm::mat4 ModelMatrix = glm::mat4();
 	do{
 
 		// Clear the screen
@@ -183,8 +187,11 @@ int main( )
 		computeMatricesFromInputs();
 		glm::mat4 ProjectionMatrix = getProjectionMatrix();
 		glm::mat4 ViewMatrix = getViewMatrix();
-		//glm::mat4 ModelMatrix = glm::mat4(1.0f);
-        glm::mat4 MV =  ViewMatrix ;//* ModelMatrix;
+        //mat4 rotation;
+        //rotation = glm::rotate(2.0f, vec3(0,1,0));
+        ModelMatrix = glm::rotate( ModelMatrix,0.001f,glm::vec3(0.0f,1.0f,0.0f));
+        //glm::rotate(0.1f,glm::vec3(0,1,0));
+        glm::mat4 MV =  ViewMatrix * ModelMatrix;
 		glm::mat4 MVP = ProjectionMatrix * MV ;
 
 		// Send our transformation to the currently bound shader,
@@ -208,6 +215,11 @@ int main( )
 		glBindTexture(GL_TEXTURE_2D, textures[2]);
 		// Set our "myTexture" sampler to use Texture Unit 0
 		glUniform1i(NormalID, 2);
+
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, textures[3]);
+		// Set our "myTexture" sampler to use Texture Unit 0
+		glUniform1i(SpecularID, 3);
 
 
 		// 1rst attribute buffer : vertices
@@ -315,6 +327,77 @@ void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texInde
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     //glGenerateMipmap(GL_TEXTURE_2D);
 }
+
+/*
+void Noise(GLuint* textures, const char* imagepath, unsigned int texIndex) {
+
+    int width, height;
+    unsigned char* image;
+    glActiveTexture(GL_TEXTURE0 + texIndex);
+    glBindTexture(GL_TEXTURE_2D, textures[texIndex]);
+    image = SOIL_load_image(imagepath, &width, &height, 0, SOIL_LOAD_RGB);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    //glUniform1i(glGetUniformLocation(shaderProgram, "myTexture"), 0);
+
+    for(int y=0; y < height; y++)
+    {
+        for(int x=0; x < width; y++)
+        {
+            textures[texIndex]
+            //perlin noise für jeden pixel
+        }
+    }
+
+
+    int save_result = SOIL_save_image
+            (
+                    "noise.png",
+                    SOIL_SAVE_TYPE_TGA,
+                    width, height, 0,
+                    image
+            );
+
+}
+
+
+float rand(vec2 c){
+    return fract(sin(dot(transpose(c) ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+float noise(glm::vec2 p, float freq, int screenWidth ){
+   float unit = screenWidth/freq;
+    vec2 ij = vec2(glm::floor(p.x / unit),glm::floor(p.y / unit));
+    vec2 xy = vec2(mod(p.x,unit),mod(p.y,unit))/unit;
+    //xy = 3.*xy*xy-2.*xy*xy*xy;
+    xy = 0.5f*(1.0f-cos(pi()*xy));
+    float a = rand((ij+vec2(0.0f,0.0f)));
+    float b = rand((ij+vec2(1.0f,0.0f)));
+    float c = rand((ij+vec2(0.0f,1.0f)));
+    float d = rand((ij+vec2(1.0f,1.0f)));
+    float x1 = mix(a, b, xy.x);
+    float x2 = mix(c, d, xy.x);
+    return mix(x1, x2, xy.y);
+}
+
+float pNoise(vec2 p, int res, int screenWidth){
+    float persistance = 0.5f;
+    float n = 0.0f;
+    float normK = 0.0f;
+    float f = 4.0f;
+    float amp = 1.0f;
+    int iCount = 0;
+    for (int i = 0; i<50; i++){
+        n+=amp*noise(p, f, screenWidth);
+        f*=2.0f;
+        normK+=amp;
+        amp*=persistance;
+        if (iCount == res) break;
+        iCount++;
+    }
+    float nf = n/normK;
+    return nf*nf*nf*nf;
+}
+ */
 
 /*
     GLuint uvbuffer;

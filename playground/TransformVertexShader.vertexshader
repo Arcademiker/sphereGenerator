@@ -21,9 +21,9 @@ uniform mat4 MV;
 uniform mat4 MVP;
 uniform vec3 light_pos = vec3(0.0, 0.0, 100.0);
 
-uniform sampler2D myTexture;
+//uniform sampler2D myTexture;
 uniform sampler2D myHeightmap;
-uniform sampler2D myNormal;
+//uniform sampler2D myNormal;
 
 void main(){
     vec4 P = MV*  vec4(vertexPosition_modelspace,1.0);
@@ -46,7 +46,7 @@ void main(){
 
 
 	// Output position of the vertex, in clip space : MVP * position
-	gl_Position =  MVP * vec4((vertexPosition_modelspace + 0.02 * normal * texture( myHeightmap, vertexUV ).x),1);
+	gl_Position =  MVP * vec4((vertexPosition_modelspace + 0.015 * normal * texture( myHeightmap, vertexUV ).x),1);
 
 }
 
