@@ -103,8 +103,8 @@ int main( )
 	glDepthFunc(GL_LESS);
 
 	// Cull triangles which normal is not towards the camera
-	//glDisable(GL_CULL_FACE);
-    glEnable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -181,7 +181,37 @@ int main( )
 	//glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
 
     //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+
     glm::mat4 ModelMatrix = glm::mat4();
+    glm::mat4 ViewMatrix = glm::mat4();
+    ///camera ini
+    int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
+    if (1 == present) {
+
+
+        float horizontalAngle = -0.1f;//0.05f*3.14f;
+        // Initial vertical angle : none
+        float verticalAngle = 0.30f * 3.14f;//2*3.14f;
+        glm::vec3 direction(
+                cos(verticalAngle) * sin(horizontalAngle),
+                sin(verticalAngle),
+                cos(verticalAngle) * cos(horizontalAngle)
+        );
+        glm::vec3 right = glm::vec3(
+                sin(horizontalAngle - 3.14f / 2.0f),
+                0,
+                cos(horizontalAngle - 3.14f / 2.0f)
+        );
+
+        // Up vector
+        glm::vec3 up = glm::cross(right, direction);
+        ViewMatrix = glm::lookAt(
+                glm::vec3(0, 0, 3),           // Camera is here
+                glm::vec3(0, 0, 3) + direction, // and looks here : at the same position, plus "direction"
+                up                  // Head is up (set to 0,-1,0 to look upside-down)
+        );
+    }
 	do{
 
 		// Clear the screen
@@ -191,12 +221,12 @@ int main( )
 		glUseProgram(programID);
 
 		// Compute the MVP matrix from keyboard and mouse input
-		computeMatricesFromInputs();
+		computeMatricesFromInputs(present);
 		glm::mat4 ProjectionMatrix = getProjectionMatrix();
-		glm::mat4 ViewMatrix = getViewMatrix();
+		ViewMatrix = getViewMatrix();
         //mat4 rotation;
         //rotation = glm::rotate(2.0f, vec3(0,1,0));
-        ModelMatrix = glm::rotate( ModelMatrix,0.0103f,glm::vec3(0.1f,1.0f,0.0f));
+        ModelMatrix = glm::rotate( ModelMatrix,0.0005f,glm::vec3(0.1f,1.0f,0.0f));
         //glm::rotate(0.1f,glm::vec3(0,1,0));
         glm::mat4 MV =  ViewMatrix * ModelMatrix;
 		glm::mat4 MVP = ProjectionMatrix * MV ;
