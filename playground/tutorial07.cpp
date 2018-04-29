@@ -61,8 +61,8 @@ int main( )
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Open a window and create its OpenGL context
-    int resolutionWidth = 1600;
-    int resolutionHeight = 1200;
+    int resolutionWidth = 1920;
+    int resolutionHeight = 1080;
 	window = glfwCreateWindow( resolutionWidth, resolutionHeight, "Tutorial 07 - Model Loading", NULL, NULL);
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an older Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
@@ -129,27 +129,32 @@ int main( )
     // Load the heightmap
     //loadImage_SOIL(textures,"../playground/marsheight.png",0);
     loadImage_SOIL(textures,"../playground/earthHeightmap8k.png",0);
+	//loadImage_SOIL(textures,"../playground/marsheightwater.png",0);
 
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint HeightmapID  = glGetUniformLocation(programID, "myHeightmap");
 
     // Load the texture
     //loadImage_SOIL(textures,"../playground/marstexture.jpg",1);
-    loadImage_SOIL(textures,"../playground/earthDiffuse8k.jpg",1);
+    //loadImage_SOIL(textures,"../playground/earthDiffuse8kice.jpg",1);
+    loadImage_SOIL(textures,"../playground/earth16kiceblue.jpg",1);
+	//loadImage_SOIL(textures,"../playground/marstexturemareblue2.jpg",1);
     GLuint TextureID  = glGetUniformLocation(programID, "myTexture");
 
 
     //load normalmap
     loadImage_SOIL(textures,"../playground/earthNormal8k.png",2);
+	//loadImage_SOIL(textures,"../playground/normalmars4.png",2);
     GLuint NormalID  = glGetUniformLocation(programID, "myNormal");
 
 	//load specular
-	loadImage_SOIL(textures,"../playground/earthSpecular28k.png",3);
+	loadImage_SOIL(textures,"../playground/earthSpecular8kfinal.png",3);
+	//loadImage_SOIL(textures,"../playground/marsspecular.png",3);
 	GLuint SpecularID  = glGetUniformLocation(programID, "mySpecular");
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
-    TriangleTesselation.Tesselate(7);
+    TriangleTesselation.Tesselate(5);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size() ;
@@ -191,7 +196,7 @@ int main( )
 		glm::mat4 ViewMatrix = getViewMatrix();
         //mat4 rotation;
         //rotation = glm::rotate(2.0f, vec3(0,1,0));
-        ModelMatrix = glm::rotate( ModelMatrix,0.001f,glm::vec3(0.0f,1.0f,0.0f));
+        ModelMatrix = glm::rotate( ModelMatrix,0.0103f,glm::vec3(0.1f,1.0f,0.0f));
         //glm::rotate(0.1f,glm::vec3(0,1,0));
         glm::mat4 MV =  ViewMatrix * ModelMatrix;
 		glm::mat4 MVP = ProjectionMatrix * MV ;
