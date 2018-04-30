@@ -186,10 +186,11 @@ int main( )
     glm::mat4 ModelMatrix = glm::mat4();
     glm::mat4 ViewMatrix = glm::mat4();
     ///camera ini
+    glfwPollEvents();
     int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
     if (1 == present) {
-
-
+        /*
+        std::cout << std::endl <<"detect joypad" << std::endl;
         float horizontalAngle = -0.1f;//0.05f*3.14f;
         // Initial vertical angle : none
         float verticalAngle = 0.30f * 3.14f;//2*3.14f;
@@ -211,6 +212,7 @@ int main( )
                 glm::vec3(0, 0, 3) + direction, // and looks here : at the same position, plus "direction"
                 up                  // Head is up (set to 0,-1,0 to look upside-down)
         );
+         */
     }
 	do{
 

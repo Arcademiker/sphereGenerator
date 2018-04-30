@@ -45,7 +45,7 @@ void computeMatricesFromInputs(int joycon){
     if (joycon)
     {
         //glm::vec3 modelScale = (vecMODELS[0]->getMaxValues() - vecMODELS[0]->getMinValues());
-        float fMoveSpeed = speed;//std::max(modelScale.x, modelScale.y);
+        float fMoveSpeed = speed/10.0f;//std::max(modelScale.x, modelScale.y);
         //fMoveSpeed = std::max(fMoveSpeed, modelScale.z);
         //fMoveSpeed = fMoveSpeed * static_cast<float>(deltaTime) / 10.0f;
 
@@ -54,11 +54,13 @@ void computeMatricesFromInputs(int joycon){
         const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axisCount);
         //std::cout << axisCount << std::endl;
         if (abs(axes[0]) > 0.01f) { ViewMatrix = glm::translate(ViewMatrix,glm::vec3(-1.0f * axes[0] * fMoveSpeed, 0.0f, 0.0f));}                  //pCamera->Translate(glm::vec3(-1.0f * axes[0] * fMoveSpeed, 0.0f, 0.0f)); }
-        if (abs(axes[1]) > 0.01f) { ViewMatrix = glm::translate(ViewMatrix,glm::vec3(0.0f, 0.0f, 1.0f * axes[1] * fMoveSpeed));}                  //pCamera->Translate(glm::vec3(0.0f, 0.0f, 1.0f * axes[1] * fMoveSpeed)); }
-        if (abs(axes[2]) > 0.01f) { ViewMatrix = glm::rotate(ViewMatrix,0.5f * axes[2] * fMoveSpeed * 10.0f,glm::vec3(0.0f, 1.0f, 0.0f));}          //pCamera->Rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.5f * axes[2] * fMoveSpeed * 10.0f); }
-        if (abs(axes[3]) > 0.01f) { ViewMatrix = glm::rotate(ViewMatrix,-0.5f * axes[3] * fMoveSpeed * 10.0f,glm::vec3(1.0f, 0.0f, 0.0f)); }
-        if (abs(axes[4] + 1.0f) > 0.01f) {  ViewMatrix = glm::translate(ViewMatrix,glm::vec3(0.0f, 1.0f * (axes[4] + 1.0f) * fMoveSpeed, 0.0f)); }
-        if (abs(axes[5] + 1.0f) > 0.01f) {  ViewMatrix = glm::translate(ViewMatrix,glm::vec3(0.0f, -1.0f * (axes[5] + 1.0f) * fMoveSpeed, 0.0f)); }
+        //if (abs(axes[1]) > 0.01f) { ViewMatrix = glm::translate(ViewMatrix,glm::vec3(0.0f, 0.0f, 1.0f * axes[1] * fMoveSpeed));}                  //pCamera->Translate(glm::vec3(0.0f, 0.0f, 1.0f * axes[1] * fMoveSpeed)); }
+        //if (abs(axes[2]) > 0.01f) { ViewMatrix = glm::rotate(ViewMatrix,0.5f * axes[2] * mouseSpeed ,glm::vec3(0.0f, 1.0f, 0.0f));}          //pCamera->Rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.5f * axes[2] * fMoveSpeed * 10.0f); }
+        //if (abs(axes[3]) > 0.01f) { ViewMatrix = glm::rotate(ViewMatrix,-0.5f * axes[3] * mouseSpeed ,glm::vec3(1.0f, 0.0f, 0.0f)); }
+        if (abs(axes[2] + 1.0f) > 0.01f) {  ViewMatrix = glm::translate(ViewMatrix,glm::vec3(0.0f, 0.0f, 1.0f * (axes[2] + 1.0f) * fMoveSpeed)); }
+        if (abs(axes[5] + 1.0f) > 0.01f) {  ViewMatrix = glm::translate(ViewMatrix,glm::vec3(0.0f, 0.0f, -1.0f * (axes[5] + 1.0f) * fMoveSpeed)); }
+        if (abs(axes[1]) > 0.01f) { ViewMatrix = glm::translate(ViewMatrix,glm::vec3(0.0f, 1.0f * axes[1] * fMoveSpeed, 0));}
+        //if (abs(axes[5]) > 0.01f) { ViewMatrix = glm::translate(ViewMatrix,glm::vec3(0.0f, 1.0f * axes[3] * fMoveSpeed, 0));}
     }
     else {
         static double lastTime = glfwGetTime();
