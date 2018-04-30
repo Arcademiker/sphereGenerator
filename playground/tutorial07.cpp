@@ -186,34 +186,7 @@ int main( )
     glm::mat4 ModelMatrix = glm::mat4();
     glm::mat4 ViewMatrix = glm::mat4();
     ///camera ini
-    glfwPollEvents();
-    int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
-    if (1 == present) {
-        /*
-        std::cout << std::endl <<"detect joypad" << std::endl;
-        float horizontalAngle = -0.1f;//0.05f*3.14f;
-        // Initial vertical angle : none
-        float verticalAngle = 0.30f * 3.14f;//2*3.14f;
-        glm::vec3 direction(
-                cos(verticalAngle) * sin(horizontalAngle),
-                sin(verticalAngle),
-                cos(verticalAngle) * cos(horizontalAngle)
-        );
-        glm::vec3 right = glm::vec3(
-                sin(horizontalAngle - 3.14f / 2.0f),
-                0,
-                cos(horizontalAngle - 3.14f / 2.0f)
-        );
 
-        // Up vector
-        glm::vec3 up = glm::cross(right, direction);
-        ViewMatrix = glm::lookAt(
-                glm::vec3(0, 0, 3),           // Camera is here
-                glm::vec3(0, 0, 3) + direction, // and looks here : at the same position, plus "direction"
-                up                  // Head is up (set to 0,-1,0 to look upside-down)
-        );
-         */
-    }
 	do{
 
 		// Clear the screen
@@ -223,7 +196,7 @@ int main( )
 		glUseProgram(programID);
 
 		// Compute the MVP matrix from keyboard and mouse input
-		computeMatricesFromInputs(present);
+		computeMatricesFromInputs();
 		glm::mat4 ProjectionMatrix = getProjectionMatrix();
 		ViewMatrix = getViewMatrix();
         //mat4 rotation;
