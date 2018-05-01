@@ -61,8 +61,8 @@ int main( )
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Open a window and create its OpenGL context
-    int resolutionWidth = 1920;
-    int resolutionHeight = 1080;
+    int resolutionWidth = 1280;
+    int resolutionHeight = 720;
 	window = glfwCreateWindow( resolutionWidth, resolutionHeight, "Tutorial 07 - Model Loading", NULL, NULL);
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an older Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
@@ -103,8 +103,8 @@ int main( )
 	glDepthFunc(GL_LESS);
 
 	// Cull triangles which normal is not towards the camera
-	glDisable(GL_CULL_FACE);
-    //glEnable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -114,7 +114,7 @@ int main( )
 	GLuint programID = LoadShaders( "../playground/TransformVertexShader.vertexshader", "../playground/TextureFragmentShader.fragmentshader" );
 
     // Get a handle for our "P" uniform
-    //GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+    //GLuint MatrixID0 = glGetUniformLocation(programID, "M");
     // Get a handle for our "MV" uniform
     GLuint MatrixID1 = glGetUniformLocation(programID, "MV");
 	// Get a handle for our "MVP" uniform
@@ -124,8 +124,8 @@ int main( )
 
 
 
-    GLuint textures[4];
-    glGenTextures(4, textures);
+    GLuint textures[5];
+    glGenTextures(5, textures);
     // Load the heightmap
     //loadImage_SOIL(textures,"../playground/marsheight.png",0);
     loadImage_SOIL(textures,"../playground/earthHeightmap8k.png",0);
@@ -151,6 +151,10 @@ int main( )
 	loadImage_SOIL(textures,"../playground/earthSpecular8kfinal.png",3);
 	//loadImage_SOIL(textures,"../playground/marsspecular.png",3);
 	GLuint SpecularID  = glGetUniformLocation(programID, "mySpecular");
+
+    //load specular
+    loadImage_SOIL(textures,"../playground/earth16knight2.jpg",4);
+    GLuint Texture2ID  = glGetUniformLocation(programID, "myTexture2");
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
@@ -209,6 +213,8 @@ int main( )
 
 
 		// Send our transformation to the currently bound shader,
+        //glUniformMatrix4fv(MatrixID0, 1, GL_FALSE, &ModelMatrix[0][0]);
+
         glUniformMatrix4fv(MatrixID1, 1, GL_FALSE, &MV[0][0]);
 		// in the "MVP" uniform
 		glUniformMatrix4fv(MatrixID2, 1, GL_FALSE, &MVP[0][0]);
@@ -236,6 +242,11 @@ int main( )
 		glBindTexture(GL_TEXTURE_2D, textures[3]);
 		// Set our "myTexture" sampler to use Texture Unit 0
 		glUniform1i(SpecularID, 3);
+
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, textures[4]);
+        // Set our "myTexture" sampler to use Texture Unit 0
+        glUniform1i(Texture2ID, 4);
 
 
 		// 1rst attribute buffer : vertices
@@ -335,12 +346,17 @@ void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texInde
     SOIL_free_image_data(image);
     //glUniform1i(glGetUniformLocation(shaderProgram, "myTexture"), 0);
 
+    glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     //glGenerateMipmap(GL_TEXTURE_2D);
 }
 
