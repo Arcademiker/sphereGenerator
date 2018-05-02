@@ -20,7 +20,7 @@ out VS_OUT
 //uniform mat4 M;
 uniform mat4 MV;
 uniform mat4 MVP;
-uniform vec3 light_pos = vec3(30.0, 0.0, 1000.0);
+uniform vec3 light_pos = vec3(0.0, 0.0, 1000.0);
 uniform mat4 ViewMatrix;
 
 /*

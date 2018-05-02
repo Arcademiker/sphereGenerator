@@ -31,7 +31,7 @@ using namespace glm;
 
 #include <common/shader.hpp>
 #include <common/texture.hpp>
-#include <common/controls.hpp>
+//#include <common/controls.hpp>
 #include <common/objloader.hpp>
 
 #include <assimp/Importer.hpp>
@@ -43,7 +43,7 @@ using namespace glm;
 #include "Camera.h"
 
 void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texIndex);
-
+void updateVPMatFromInput(CCamera* pCamera, float speed);
 
 int main( )
 {
@@ -62,9 +62,9 @@ int main( )
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Open a window and create its OpenGL context
-    int resolutionWidth = 1920;
-    int resolutionHeight = 1080;
-	window = glfwCreateWindow( resolutionWidth, resolutionHeight, "Tutorial 07 - Model Loading", NULL, NULL);
+    int resWidth = 1920;
+    int resHeight = 1080;
+	window = glfwCreateWindow( resWidth, resHeight, "Tutorial 07 - Model Loading", NULL, NULL);
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an older Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
 		getchar();
@@ -86,10 +86,29 @@ int main( )
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     // Hide the mouse and enable unlimited mouvement
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    
+
+    ///cam-->
+    float horizontalAngle = 0;//-0.5f*3.14f;
+    // Initial vertical angle : none
+    float verticalAngle = 0;//3.14f+0.5f;//2*3.14f;
+    glm::vec3 direction(
+            cos(verticalAngle) * sin(horizontalAngle),
+            sin(verticalAngle),
+            cos(verticalAngle) * cos(horizontalAngle)
+    );
+    glm::vec3 right = glm::vec3(
+            sin(horizontalAngle - 3.1415f/2.0f),
+            0,
+            cos(horizontalAngle - 3.1415f/2.0f)
+    );
+    glm::vec3 up = glm::cross( right, direction );
+    float aspectRatio = static_cast<float>(resWidth)/static_cast<float>(resHeight);
+    CCamera pCamera(glm::radians(45.0f), aspectRatio,0.001f, 5.0f, glm::vec3( 0, 0, 0 ),direction,up );
+
+    ///<--cam
     // Set the mouse at the center of the screen
     glfwPollEvents();
-    glfwSetCursorPos(window, resolutionWidth/2, resolutionHeight/2);
+    glfwSetCursorPos(window, resWidth/2, resHeight/2);
 
 	// Light background
 	//glClearColor(0.9f, 1.0f, 0.9f, 0.0f);
@@ -104,8 +123,8 @@ int main( )
 	glDepthFunc(GL_LESS);
 
 	// Cull triangles which normal is not towards the camera
-	//glDisable(GL_CULL_FACE);
-    glEnable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -190,6 +209,8 @@ int main( )
 
     glm::mat4 ModelMatrix = glm::mat4();
     glm::mat4 ViewMatrix = glm::mat4();
+    glm::mat4 ProjectionMatrix = glm::mat4();
+	//ModelMatrix = glm::rotate( ModelMatrix,3.141592f,glm::vec3(0.0f,0.0f,1.0f));
     ///camera ini
 
 	do{
@@ -201,12 +222,13 @@ int main( )
 		glUseProgram(programID);
 
 		// Compute the MVP matrix from keyboard and mouse input
-		computeMatricesFromInputs();
-		glm::mat4 ProjectionMatrix = getProjectionMatrix();
-		ViewMatrix = getViewMatrix();
+		//computeMatricesFromInputs();
+        updateVPMatFromInput(&pCamera,0.004f);
+		ProjectionMatrix = pCamera.GetProjectionMatrix();
+		ViewMatrix = pCamera.GetViewMatrix();
         //mat4 rotation;
         //rotation = glm::rotate(2.0f, vec3(0,1,0));
-        ModelMatrix = glm::rotate( ModelMatrix,0.001f,glm::vec3(0.1f,1.0f,0.0f));
+        ModelMatrix = glm::rotate( ModelMatrix,0.01f,glm::vec3(0.0f,1.0f,0.0f));
         //glm::rotate(0.1f,glm::vec3(0,1,0));
         glm::mat4 MV =  ViewMatrix * ModelMatrix;
 		glm::mat4 MVP = ProjectionMatrix * MV ;
@@ -377,12 +399,19 @@ void updateVPMatFromInput(CCamera* pCamera, float speed) {
 		int axisCount;
 		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axisCount);
 		//std::cout << axisCount << std::endl;
-		if (abs(axes[0]) > 0.01f) { pCamera->Translate(glm::vec3(-1.0f * axes[0] * fMoveSpeed, 0.0f, 0.0f)); }
-		if (abs(axes[1]) > 0.01f) { pCamera->Translate(glm::vec3(0.0f, 0.0f, 1.0f * axes[1] * fMoveSpeed)); }
-		if (abs(axes[2]) > 0.01f) { pCamera->Rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.5f * axes[2] * fMoveSpeed * 10.0f); }
-		if (abs(axes[3]) > 0.01f) { pCamera->AddPitch(-0.5f * axes[3] * fMoveSpeed * 10.0f); }
-		if (abs(axes[4] + 1.0f) > 0.01f) { pCamera->Translate(glm::vec3(0.0f, 1.0f * (axes[4] + 1.0f) * fMoveSpeed, 0.0f)); }
-		if (abs(axes[5] + 1.0f) > 0.01f) { pCamera->Translate(glm::vec3(0.0f, -1.0f * (axes[5] + 1.0f) * fMoveSpeed, 0.0f)); }
+		//if (abs(axes[0]) > 0.1f) { pCamera->Translate(glm::vec3(-1.0f * axes[0] * fMoveSpeed, 0.0f, 0.0f)); }
+		//if (abs(axes[1]) > 0.1f) { pCamera->Translate(glm::vec3(0.0f, 0.0f, 1.0f * axes[1] * fMoveSpeed)); }
+		//if (abs(axes[4]) > 0.1f) { pCamera->Rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.5f * axes[4] * fMoveSpeed * 10.0f); }
+		//if (abs(axes[3]) > 0.1f) { pCamera->AddPitch(-0.5f * axes[3] * fMoveSpeed * 100.0f); }
+		//if (abs(axes[2] + 1.0f) > 0.1f) { pCamera->Translate(glm::vec3(0.0f, 1.0f * (axes[2] + 1.0f) * fMoveSpeed, 0.0f)); }
+		//if (abs(axes[5] + 1.0f) > 0.1f) { pCamera->Translate(glm::vec3(0.0f, -1.0f * (axes[5] + 1.0f) * fMoveSpeed, 0.0f)); }
+
+		if (abs(axes[0]) > 0.1f) { pCamera->Translate(glm::vec3(-1.0f * axes[0] * fMoveSpeed, 0.0f, 0.0f)); }
+		if (abs(axes[1]) > 0.1f) { pCamera->Translate(glm::vec3(0.0f, 1.0f * axes[1] * fMoveSpeed, 0.0f )); }
+		if (abs(axes[4]) > 0.1f) { pCamera->Rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.5f * axes[4] * fMoveSpeed * 10.0f); }
+		if (abs(axes[3]) > 0.1f) { pCamera->AddPitch(axes[3] * fMoveSpeed * 180.0f); }
+		if (abs(axes[2] + 1.0f) > 0.1f) { pCamera->Translate(glm::vec3(0.0f,0.0f,-1.0f * (axes[2] + 1.0f) * fMoveSpeed)); }
+		if (abs(axes[5] + 1.0f) > 0.1f) { pCamera->Translate(glm::vec3(0.0f,0.0f,1.0f * (axes[5] + 1.0f) * fMoveSpeed)); }
 	}
 }
 

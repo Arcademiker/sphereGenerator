@@ -19,8 +19,8 @@ CCamera::CCamera(float fLeft, float fRight,float fBottom, float fTop, float fNea
 
 void CCamera::SetPerspective(float fFieldOfView, float fAspectRatio, float fNearClippingplane, float fFarClippingPlane)
 {
-    m_ProjectionMatrix = glm::perspective(fFieldOfView * m_fPI / 180.0f, fAspectRatio, fNearClippingplane, fFarClippingPlane);
-    m_fHorizontalFieldOfView = fFieldOfView * m_fPI / 180.0f;
+    m_ProjectionMatrix = glm::perspective(fFieldOfView /** m_fPI / 180.0f*/, fAspectRatio, fNearClippingplane, fFarClippingPlane);
+    m_fHorizontalFieldOfView = fFieldOfView /** m_fPI / 180.0f*/;
     m_fAspectRatio = fAspectRatio;
     m_bPerspective = true;
 }
@@ -64,7 +64,7 @@ glm::mat4 CCamera::GetViewProjectionMatrix() const
 
 void CCamera::Rotate(glm::vec3 RotationAxe, float fAngle)
 {
-    m_ViewMatrix = glm::rotate(fAngle * m_fPI / 180.0f, RotationAxe) * m_ViewMatrix;
+    m_ViewMatrix = glm::rotate(fAngle /** m_fPI / 180.0f*/, RotationAxe) * m_ViewMatrix;
 }
 
 void CCamera::Translate(glm::vec3 Translation)
@@ -74,7 +74,7 @@ void CCamera::Translate(glm::vec3 Translation)
 
 void CCamera::AddPitch(float fPitch)
 {
-    m_fPitch += fPitch *m_fPI / 180.0f;
+    m_fPitch += fPitch   *m_fPI / 180.0f ;
     m_fPitch = m_fPitch > m_fPI / 2.0f ? m_fPI / 2.0f : m_fPitch;
     m_fPitch = m_fPitch < -m_fPI / 2.0f ? -m_fPI / 2.0f : m_fPitch;
 }

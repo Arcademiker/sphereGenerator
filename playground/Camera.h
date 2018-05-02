@@ -5,7 +5,7 @@
 class CCamera
 {
 public:
-    CCamera(float fFieldOfView, float fNearClippingplane, float fFarClippingPlane, float fAspectRatio, glm::vec3 EyePosition, glm::vec3 LookAtVector, glm::vec3 UpVector);
+    CCamera(float fFieldOfView,  float fAspectRatio, float fNearClippingplane, float fFarClippingPlane, glm::vec3 EyePosition, glm::vec3 LookAtVector, glm::vec3 UpVector);
     CCamera(float fLeft, float fRight, float fBottom, float fTop, float fNear, float fFar, glm::vec3 EyePosition, glm::vec3 LookAtVector, glm::vec3 UpVector);
     ~CCamera();
 
