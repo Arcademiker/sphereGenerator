@@ -62,7 +62,7 @@ add_executable(playground
 	playground/TextureFragmentShader.fragmentshader
 	#playground/SimpleFragmentShader.fragmentshader
 	#playground/SimpleVertexShader.vertexshader
-		playground/ModelObject.cpp playground/ModelObject.h)
+		playground/ModelObject.cpp playground/ModelObject.h playground/Camera.cpp playground/Camera.h)
 #libSOIL.a for loading textures
 target_link_libraries(playground
 	${ALL_LIBS} libSOIL.a

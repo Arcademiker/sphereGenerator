@@ -55,7 +55,7 @@ void main(){
     vec3 B = cross(N,T);
 
     //dont move lightsource with cam
-    vec3 L = (ViewMatrix* vec4(light_pos,1.0)).xyz - P.xyz;
+    vec3 L = (MV* vec4(light_pos,1.0)).xyz - P.xyz;
     //vec3 L = (vec4(light_pos,1.0)).xyz - P.xyz;
     vec3 V = -P.xyz;
     vs_out.lightDir = normalize(vec3(dot(L, T), dot(L, B), dot(L, N)));

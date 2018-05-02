@@ -40,6 +40,7 @@ using namespace glm;
 
 #include <iostream>
 #include "SOIL.h"
+#include "Camera.h"
 
 void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texIndex);
 
@@ -93,7 +94,7 @@ int main( )
 	// Light background
 	//glClearColor(0.9f, 1.0f, 0.9f, 0.0f);
 	// Dark background
-	glClearColor(0.1f, 0.0f, 0.1f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 
 
@@ -153,12 +154,12 @@ int main( )
 	GLuint SpecularID  = glGetUniformLocation(programID, "mySpecular");
 
     //load specular
-    loadImage_SOIL(textures,"../playground/earth16knight2.jpg",4);
+    loadImage_SOIL(textures,"../playground/earth16knight3.jpg",4);
     GLuint Texture2ID  = glGetUniformLocation(programID, "myTexture2");
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
-    TriangleTesselation.Tesselate(5);
+    TriangleTesselation.Tesselate(7);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size() ;
@@ -359,6 +360,32 @@ void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texInde
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     //glGenerateMipmap(GL_TEXTURE_2D);
 }
+
+
+
+void updateVPMatFromInput(CCamera* pCamera, float speed) {
+	glfwPollEvents();
+	int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
+	if (1 == present)
+	{
+		//glm::vec3 modelScale = (vecMODELS[0]->getMaxValues() - vecMODELS[0]->getMinValues());
+		float fMoveSpeed = speed;//std::max(modelScale.x, modelScale.y);
+		//fMoveSpeed = std::max(fMoveSpeed, modelScale.z);
+		//fMoveSpeed = fMoveSpeed * static_cast<float>(dTimeDiff) / 10.0f;
+
+
+		int axisCount;
+		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axisCount);
+		//std::cout << axisCount << std::endl;
+		if (abs(axes[0]) > 0.01f) { pCamera->Translate(glm::vec3(-1.0f * axes[0] * fMoveSpeed, 0.0f, 0.0f)); }
+		if (abs(axes[1]) > 0.01f) { pCamera->Translate(glm::vec3(0.0f, 0.0f, 1.0f * axes[1] * fMoveSpeed)); }
+		if (abs(axes[2]) > 0.01f) { pCamera->Rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.5f * axes[2] * fMoveSpeed * 10.0f); }
+		if (abs(axes[3]) > 0.01f) { pCamera->AddPitch(-0.5f * axes[3] * fMoveSpeed * 10.0f); }
+		if (abs(axes[4] + 1.0f) > 0.01f) { pCamera->Translate(glm::vec3(0.0f, 1.0f * (axes[4] + 1.0f) * fMoveSpeed, 0.0f)); }
+		if (abs(axes[5] + 1.0f) > 0.01f) { pCamera->Translate(glm::vec3(0.0f, -1.0f * (axes[5] + 1.0f) * fMoveSpeed, 0.0f)); }
+	}
+}
+
 
 /*
 void Noise(GLuint* textures, const char* imagepath, unsigned int texIndex) {
