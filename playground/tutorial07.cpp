@@ -31,7 +31,7 @@ using namespace glm;
 
 #include <common/shader.hpp>
 #include <common/texture.hpp>
-//#include <common/controls.hpp>
+#include <common/controls.hpp>
 #include <common/objloader.hpp>
 
 #include <assimp/Importer.hpp>
@@ -87,6 +87,7 @@ int main( )
     // Hide the mouse and enable unlimited mouvement
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    /*
     ///cam-->
     float horizontalAngle = 0;//-0.5f*3.14f;
     // Initial vertical angle : none
@@ -106,6 +107,7 @@ int main( )
     CCamera pCamera(glm::radians(45.0f), aspectRatio,0.001f, 5.0f, glm::vec3( 0, 0, 0 ),direction,up );
 
     ///<--cam
+     */
     // Set the mouse at the center of the screen
     glfwPollEvents();
     glfwSetCursorPos(window, resWidth/2, resHeight/2);
@@ -123,8 +125,8 @@ int main( )
 	glDepthFunc(GL_LESS);
 
 	// Cull triangles which normal is not towards the camera
-	glDisable(GL_CULL_FACE);
-    //glEnable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -222,13 +224,17 @@ int main( )
 		glUseProgram(programID);
 
 		// Compute the MVP matrix from keyboard and mouse input
-		//computeMatricesFromInputs();
-        updateVPMatFromInput(&pCamera,0.004f);
-		ProjectionMatrix = pCamera.GetProjectionMatrix();
-		ViewMatrix = pCamera.GetViewMatrix();
+		computeMatricesFromInputs();
+		ViewMatrix =  getViewMatrix();
+		ProjectionMatrix = getProjectionMatrix();
+
+		//controller
+		//updateVPMatFromInput(&pCamera,0.004f);
+		//ProjectionMatrix = pCamera.GetProjectionMatrix();
+		//ViewMatrix = pCamera.GetViewMatrix();
         //mat4 rotation;
         //rotation = glm::rotate(2.0f, vec3(0,1,0));
-        ModelMatrix = glm::rotate( ModelMatrix,0.01f,glm::vec3(0.0f,1.0f,0.0f));
+        ModelMatrix = glm::rotate( ModelMatrix,0.001f,glm::vec3(0.0f,1.0f,0.0f));
         //glm::rotate(0.1f,glm::vec3(0,1,0));
         glm::mat4 MV =  ViewMatrix * ModelMatrix;
 		glm::mat4 MVP = ProjectionMatrix * MV ;
