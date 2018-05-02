@@ -31,7 +31,7 @@ void main(){
 
     vec3 diffuse_albedo = texture(myTexture, fs_in.UV).rgb;
     float illum = clamp(dot(N,L), 0.0, 1.0);
-    vec3 diffuse =  max(illum * diffuse_albedo , (max(0.4-2.0*illum*illum,0.0)*2.0) * texture(myTexture2, fs_in.UV).rgb-0.03);
+    vec3 diffuse =  max(illum * diffuse_albedo , (max(0.4-2.0*illum*illum,0.0)*2.5) * texture(myTexture2, fs_in.UV).rgb-0.05);
     //vec3 diffuse = max(dot(N,L), 0.0) * diffuse_albedo;
     //Uncomment this to turn off diffuse shading
     //diffuse = vec3(0.0);

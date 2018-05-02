@@ -50,8 +50,8 @@ void computeMatricesFromInputs(){
 
     // Reset mouse position for next frame
     //glfwSetCursorPos(window, 1024/2, 768/2);
-    float width = 1280;
-    float height = 720;
+    float width = 1920;
+    float height = 1080;
     glfwSetCursorPos(window, width/2, height/2);
 
     // Compute new orientation

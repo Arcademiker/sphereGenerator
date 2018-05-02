@@ -62,8 +62,8 @@ int main( )
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Open a window and create its OpenGL context
-    int resolutionWidth = 1280;
-    int resolutionHeight = 720;
+    int resolutionWidth = 1920;
+    int resolutionHeight = 1080;
 	window = glfwCreateWindow( resolutionWidth, resolutionHeight, "Tutorial 07 - Model Loading", NULL, NULL);
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an older Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
@@ -206,7 +206,7 @@ int main( )
 		ViewMatrix = getViewMatrix();
         //mat4 rotation;
         //rotation = glm::rotate(2.0f, vec3(0,1,0));
-        ModelMatrix = glm::rotate( ModelMatrix,0.0005f,glm::vec3(0.1f,1.0f,0.0f));
+        ModelMatrix = glm::rotate( ModelMatrix,0.001f,glm::vec3(0.1f,1.0f,0.0f));
         //glm::rotate(0.1f,glm::vec3(0,1,0));
         glm::mat4 MV =  ViewMatrix * ModelMatrix;
 		glm::mat4 MVP = ProjectionMatrix * MV ;
@@ -350,8 +350,8 @@ void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texInde
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

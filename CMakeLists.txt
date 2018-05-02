@@ -10,7 +10,8 @@ find_package(OpenGL REQUIRED)
 # Compile external dependencies
 add_subdirectory (external)
 
-#link_directories(/usr/local/lib)
+#windows path
+link_directories("c:/SOIL(tom)/soil-master/build")
 
 include_directories(
 	external/AntTweakBar-1.16/include/
@@ -32,10 +33,21 @@ add_definitions(
 	-DTW_STATIC
 	-DTW_NO_LIB_PRAGMA
 	-DTW_NO_DIRECT3D
+		#test
+	#-lSOIL
 	-DGLEW_STATIC
 	-D_CRT_SECURE_NO_WARNINGS
 )
 
+
+# Find SOIL
+# Find the SOIL includes and library
+#
+#  SOIL_INCLUDE_DIRS - where to find SOIL.h, etc.
+#  SOIL_LIBRARIES    - List of libraries when using SOIL.
+#  SOIL_FOUND        - True if SOIL found.
+#
+# Based on the FindZLIB.cmake module.
 
 
 
@@ -62,11 +74,17 @@ add_executable(playground
 	playground/TextureFragmentShader.fragmentshader
 	#playground/SimpleFragmentShader.fragmentshader
 	#playground/SimpleVertexShader.vertexshader
-		playground/ModelObject.cpp playground/ModelObject.h playground/Camera.cpp playground/Camera.h)
+		playground/ModelObject.cpp playground/ModelObject.h playground/Camera.cpp playground/Camera.h )
+
+		#SOIL.h)
+
 #libSOIL.a for loading textures
 target_link_libraries(playground
-	${ALL_LIBS} libSOIL.a
+	${ALL_LIBS} libsoil.a
 )
+
+#SOIL.lib
+
 
 # Xcode and Visual working directories
 #set_target_properties(playground PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/playground/")
