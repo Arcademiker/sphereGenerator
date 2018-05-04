@@ -31,7 +31,7 @@ using namespace glm;
 
 #include <common/shader.hpp>
 #include <common/texture.hpp>
-#include <common/controls.hpp>
+//#include <common/controls.hpp>
 #include <common/objloader.hpp>
 
 #include <assimp/Importer.hpp>
@@ -87,7 +87,7 @@ int main( )
     // Hide the mouse and enable unlimited mouvement
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    /*
+
     ///cam-->
     float horizontalAngle = 0;//-0.5f*3.14f;
     // Initial vertical angle : none
@@ -107,7 +107,7 @@ int main( )
     CCamera pCamera(glm::radians(45.0f), aspectRatio,0.001f, 5.0f, glm::vec3( 0, 0, 0 ),direction,up );
 
     ///<--cam
-     */
+
     // Set the mouse at the center of the screen
     glfwPollEvents();
     glfwSetCursorPos(window, resWidth/2, resHeight/2);
@@ -174,13 +174,13 @@ int main( )
 	//loadImage_SOIL(textures,"../playground/marsspecular.png",3);
 	GLuint SpecularID  = glGetUniformLocation(programID, "mySpecular");
 
-    //load specular
-    loadImage_SOIL(textures,"../playground/earth16knight3.jpg",4);
+    //load nighttexture
+    loadImage_SOIL(textures,"../playground/earth16cities4.jpg",4);
     GLuint Texture2ID  = glGetUniformLocation(programID, "myTexture2");
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
-    TriangleTesselation.Tesselate(7);
+    TriangleTesselation.Tesselate(5);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size() ;
@@ -224,14 +224,14 @@ int main( )
 		glUseProgram(programID);
 
 		// Compute the MVP matrix from keyboard and mouse input
-		computeMatricesFromInputs();
-		ViewMatrix =  getViewMatrix();
-		ProjectionMatrix = getProjectionMatrix();
+		///computeMatricesFromInputs();
+		///ViewMatrix =  getViewMatrix();
+		///ProjectionMatrix = getProjectionMatrix();
 
 		//controller
-		//updateVPMatFromInput(&pCamera,0.004f);
-		//ProjectionMatrix = pCamera.GetProjectionMatrix();
-		//ViewMatrix = pCamera.GetViewMatrix();
+		updateVPMatFromInput(&pCamera,0.004f);
+		ProjectionMatrix = pCamera.GetProjectionMatrix();
+		ViewMatrix = pCamera.GetViewMatrix();
         //mat4 rotation;
         //rotation = glm::rotate(2.0f, vec3(0,1,0));
         ModelMatrix = glm::rotate( ModelMatrix,0.001f,glm::vec3(0.0f,1.0f,0.0f));
@@ -375,7 +375,7 @@ void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texInde
     SOIL_free_image_data(image);
     //glUniform1i(glGetUniformLocation(shaderProgram, "myTexture"), 0);
 
-    glGenerateMipmap(GL_TEXTURE_2D);
+    //glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

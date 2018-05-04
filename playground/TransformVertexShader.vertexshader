@@ -43,8 +43,8 @@ uniform sampler2D myHeightmap;
 //uniform sampler2D myNormal;
 
 void main(){
-    vec4 P = ViewMatrix*  vec4(vertexPosition_modelspace,1.0);
-    //vec4 P = MV*  vec4(vertexPosition_modelspace,1.0);
+    //vec4 P = ViewMatrix*  vec4(vertexPosition_modelspace,1.0);
+    vec4 P = MV*  vec4(vertexPosition_modelspace,1.0);
 
     //rotate light with planet:
     //vec3 light_pos = ((rotationMatrix(0.01f,vec3(0.1f,1.0f,0.0f))) * vec4(light_pos, 1.0)).rgb;
