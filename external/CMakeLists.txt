@@ -9,6 +9,7 @@ add_definitions(
 	-DTW_NO_DIRECT3D
 	-DGLEW_STATIC
 	-D_CRT_SECURE_NO_WARNINGS
+	#-lGL -lGLEW -lGLU -lglut -lX11 -ldrm
 )
 
 ### GLFW ###

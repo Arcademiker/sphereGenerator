@@ -31,14 +31,16 @@ using namespace glm;
 
 #include <common/shader.hpp>
 #include <common/texture.hpp>
-//#include <common/controls.hpp>
+#include <common/controls.hpp>
 #include <common/objloader.hpp>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+//#include <assimp/Importer.hpp>
+//#include <assimp/scene.h>
+//#include <assimp/postprocess.h>
 
 #include <iostream>
+#include <GL/glxew.h>
+//#include <GL/glx.h>
 #include "SOIL.h"
 #include "Camera.h"
 
@@ -61,6 +63,8 @@ int main( )
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+
+
     // Open a window and create its OpenGL context
     int resWidth = 1920;
     int resHeight = 1080;
@@ -82,6 +86,14 @@ int main( )
 		return -1;
 	}
 
+    //activating vsync
+    Display *dpy = glXGetCurrentDisplay();
+    GLXDrawable drawable = glXGetCurrentDrawable();
+    const int interval = 1;
+    if (drawable) {
+        glXSwapIntervalEXT(dpy, drawable, interval);
+    }
+
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     // Hide the mouse and enable unlimited mouvement
@@ -89,6 +101,7 @@ int main( )
 
 
     ///cam-->
+	/*
     float horizontalAngle = 0;//-0.5f*3.14f;
     // Initial vertical angle : none
     float verticalAngle = 0;//3.14f+0.5f;//2*3.14f;
@@ -105,7 +118,7 @@ int main( )
     glm::vec3 up = glm::cross( right, direction );
     float aspectRatio = static_cast<float>(resWidth)/static_cast<float>(resHeight);
     CCamera pCamera(glm::radians(45.0f), aspectRatio,0.001f, 5.0f, glm::vec3( 0, 0, 0 ),direction,up );
-
+	*/
     ///<--cam
 
     // Set the mouse at the center of the screen
@@ -180,10 +193,11 @@ int main( )
 
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f);
-    TriangleTesselation.Tesselate(5);
+    TriangleTesselation.Tesselate(7);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size() ;
+
     //std::vector<CTriangle> tmp = *triangles;
     //std::cout << tmp.at(0).GetPoint1()->fY << std::endl;
 
@@ -224,14 +238,14 @@ int main( )
 		glUseProgram(programID);
 
 		// Compute the MVP matrix from keyboard and mouse input
-		///computeMatricesFromInputs();
-		///ViewMatrix =  getViewMatrix();
-		///ProjectionMatrix = getProjectionMatrix();
+		computeMatricesFromInputs();
+		ViewMatrix =  getViewMatrix();
+		ProjectionMatrix = getProjectionMatrix();
 
 		//controller
-		updateVPMatFromInput(&pCamera,0.004f);
-		ProjectionMatrix = pCamera.GetProjectionMatrix();
-		ViewMatrix = pCamera.GetViewMatrix();
+		///updateVPMatFromInput(&pCamera,0.004f);
+		///ProjectionMatrix = pCamera.GetProjectionMatrix();
+		///ViewMatrix = pCamera.GetViewMatrix();
         //mat4 rotation;
         //rotation = glm::rotate(2.0f, vec3(0,1,0));
         ModelMatrix = glm::rotate( ModelMatrix,0.001f,glm::vec3(0.0f,1.0f,0.0f));

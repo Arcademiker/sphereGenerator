@@ -11,7 +11,7 @@ find_package(OpenGL REQUIRED)
 add_subdirectory (external)
 
 #windows path
-link_directories("c:/SOIL(tom)/soil-master/build")
+#link_directories("c:/SOIL(tom)/soil-master/build")
 
 include_directories(
 	external/AntTweakBar-1.16/include/
@@ -80,7 +80,7 @@ add_executable(playground
 
 #libSOIL.a for loading textures
 target_link_libraries(playground
-	${ALL_LIBS} libsoil.a
+	${ALL_LIBS} libSOIL.a
 )
 
 #SOIL.lib
