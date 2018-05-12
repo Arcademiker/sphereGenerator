@@ -15,6 +15,7 @@ public:
     explicit CGraph(unsigned int size);
     ~CGraph();
     void addEdge(int u, int v, int w);
+    void addTriangle(unsigned int point1,unsigned int point2,unsigned int point3);
 
     void printGraph();
 };

@@ -29,6 +29,13 @@ void CGraph::addEdge(int u, int v, int w) {
     //this->G->at(v).push_back({u,w});
 }
 
+
+void CGraph::addTriangle(unsigned int point1, unsigned int point2, unsigned int point3) {
+    addEdge(point1, point2, 1);
+    addEdge(point2, point3, 1);
+    addEdge(point3, point1, 1);
+}
+
 void CGraph::printGraph() {
     for (int v = 0; v < this->G->size(); ++v) {
         std::cout << "\n Adjacency list of vertex " << v << "\n head ";
@@ -38,3 +45,6 @@ void CGraph::printGraph() {
         std::printf("\n");
     }
 }
+
+
+

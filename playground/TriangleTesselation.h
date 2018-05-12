@@ -14,12 +14,12 @@ public:
 
 	void Tesselate(uint32_t nIterations = 5);
 	const std::vector<CTriangle>* GetTriangleList() const;
-    const CGraph* GetGraph() const;
+    CGraph* GetGraph();
 
 private:
 
 	void GenerateTetraeder();
-    void GenerateGraph();
+    //void GenerateGraph();
 	void ComputeTextureCoordinates();
     void ComputeTangentBitangent();
     void ComputePointTangent(CTriangle::SPoint3D *Point);
@@ -29,5 +29,6 @@ private:
 	float m_fRadius = 1.0f;
 	std::vector<CTriangle>* m_vecTriangleList[2];
     CGraph* m_graph;
+    unsigned int m_nVertices = 12;
 };
 

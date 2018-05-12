@@ -196,26 +196,15 @@ int main( )
     GLuint Texture2ID  = glGetUniformLocation(programID, "myTexture2");
 
     /// generate sphere object:
-    CTriangleTesselation TriangleTesselation(0.5f,3);
+    CTriangleTesselation TriangleTesselation(0.5f,2);
     //TriangleTesselation.Tesselate(1);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size();
 
     ///test Graph
-	/*
-    const auto iNumberVertices = static_cast<const unsigned int>(triangles->size());
-    CGraph graph(iNumberVertices);
-    for(int i = 3; i < iNumberVertices-3; i+=2) {
-        graph.addEdge(i,i-3,1);
-        graph.addEdge(i,i-2,2);
-        graph.addEdge(i,i-1,3);
-        graph.addEdge(i,i+1,4);
-        graph.addEdge(i,i+2,5);
-        graph.addEdge(i,i+3,6);
-    }
-    graph.printGraph();
-    */
+    TriangleTesselation.GetGraph()->printGraph();
+
     //std::vector<CTriangle> tmp = *triangles;
     //std::cout << tmp.at(0).GetPoint1()->fY << std::endl;
 
@@ -238,7 +227,7 @@ int main( )
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	//glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
 
-    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 
     glm::mat4 ModelMatrix = glm::mat4();

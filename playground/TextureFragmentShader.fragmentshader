@@ -47,6 +47,6 @@ void main(){
     //vec3 specular = max(pow(dot(R, V), 5.0), 0.0) * specular_albedo;
     //specular = vec3(0.0);
 
-    color = vec4( diffuse +    clamp(specular,0.0,1.0) * 0.75  +0.5, 1.0);
+    color = vec4( diffuse /* +    clamp(specular,0.0,1.0) * 0.75  + */ + 0.5, 1.0);
     //color = vec4(texture(myTexture, fs_in.UV).rgb,1.0);
 }
