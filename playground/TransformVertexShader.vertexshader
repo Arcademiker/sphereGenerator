@@ -23,20 +23,6 @@ uniform mat4 MVP;
 uniform vec3 light_pos = vec3(0.0, 0.0, 1000.0);
 uniform mat4 ViewMatrix;
 
-/*
-mat4 rotationMatrix(float angle, vec3 axis)
-{
-    axis = normalize(axis);
-    float s = sin(angle);
-    float c = cos(angle);
-    float oc = 1.0 - c;
-
-    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
-                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
-                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
-                0.0,                                0.0,                                0.0,                                1.0);
-}
-*/
 
 //uniform sampler2D myTexture;
 uniform sampler2D myHeightmap;
@@ -45,9 +31,6 @@ uniform sampler2D myHeightmap;
 void main(){
     //vec4 P = ViewMatrix*  vec4(vertexPosition_modelspace,1.0);
     vec4 P = MV*  vec4(vertexPosition_modelspace,1.0);
-
-    //rotate light with planet:
-    //vec3 light_pos = ((rotationMatrix(0.01f,vec3(0.1f,1.0f,0.0f))) * vec4(light_pos, 1.0)).rgb;
 
     vec3 N = normalize(mat3(MV)*normal);
     vec3 T = normalize(mat3(MV)*tangent);

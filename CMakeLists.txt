@@ -10,8 +10,8 @@ find_package(OpenGL REQUIRED)
 # Compile external dependencies
 add_subdirectory (external)
 
-#windows path
-#link_directories("c:/SOIL(tom)/soil-master/build")
+#windows path to SOIL
+#link_directories("c:/soil-master/build")
 
 include_directories(
 	external/AntTweakBar-1.16/include/
@@ -19,7 +19,6 @@ include_directories(
 	external/glm-0.9.7.1/
 	external/glew-1.13.0/include/
 	external/assimp-3.0.1270/include/
-	external/bullet-2.81-rev2613/src/
 	.
 )
 
@@ -33,57 +32,35 @@ add_definitions(
 	-DTW_STATIC
 	-DTW_NO_LIB_PRAGMA
 	-DTW_NO_DIRECT3D
-		#test
-	#-lSOIL
 	-DGLEW_STATIC
 	-D_CRT_SECURE_NO_WARNINGS
 )
 
 
-# Find SOIL
-# Find the SOIL includes and library
-#
-#  SOIL_INCLUDE_DIRS - where to find SOIL.h, etc.
-#  SOIL_LIBRARIES    - List of libraries when using SOIL.
-#  SOIL_FOUND        - True if SOIL found.
-#
-# Based on the FindZLIB.cmake module.
-
-
-
 # User playground
 add_executable(playground
-	playground/tutorial07.cpp
+	playground/main.cpp
 	playground/sphereGenerator.cpp
-	playground/stdafx.cpp
-	playground/stdafx.h
-	playground/targetver.h
 	playground/Triangle.cpp
 	playground/Triangle.h
 	playground/TriangleTesselation.cpp
 	playground/TriangleTesselation.cpp
-	common/shader.cpp
-	common/shader.hpp
-	common/controls.cpp
-	common/controls.hpp
-	common/texture.cpp
-	common/texture.hpp
-	common/objloader.cpp
-	common/objloader.hpp
 	playground/TransformVertexShader.vertexshader
 	playground/TextureFragmentShader.fragmentshader
-	#playground/SimpleFragmentShader.fragmentshader
-	#playground/SimpleVertexShader.vertexshader
-		playground/ModelObject.cpp playground/ModelObject.h playground/Camera.cpp playground/Camera.h )
-
-		#SOIL.h)
+	playground/ModelObject.cpp
+	playground/ModelObject.h
+	playground/Camera.cpp
+	playground/Camera.h
+    common/shader.cpp
+    common/shader.hpp
+    common/controls.cpp
+    common/controls.hpp playground/Graph.cpp playground/Graph.h)
 
 #libSOIL.a for loading textures
 target_link_libraries(playground
 	${ALL_LIBS} libSOIL.a
 )
 
-#SOIL.lib
 
 
 # Xcode and Visual working directories

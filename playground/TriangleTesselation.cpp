@@ -4,22 +4,27 @@
 #include <iostream>
 
 
-CTriangleTesselation::CTriangleTesselation(float fRadius)
+
+CTriangleTesselation::CTriangleTesselation(float fRadius, uint32_t nIterations)
 {
 	m_fRadius = fRadius;
 	m_vecTriangleList[0] = new std::vector<CTriangle>();
 	m_vecTriangleList[1] = new std::vector<CTriangle>();
+    GenerateTetraeder();
+    Tesselate(nIterations);
+    //this->m_graph = new CGraph(static_cast<const unsigned int>(this->GetTriangleList()->size()));
+    //GenerateGraph();
 }
 
 CTriangleTesselation::~CTriangleTesselation()
 {
 	delete m_vecTriangleList[0];
 	delete m_vecTriangleList[1];
+    delete m_graph;
 }
 
 void CTriangleTesselation::Tesselate(uint32_t nIterations)
 {
-	GenerateTetraeder();
 	for (size_t i = 0; i < nIterations;++i)
 	{
 		m_vecTriangleList[1 - m_nArrayResult]->clear();
@@ -45,16 +50,18 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
             PointNew3.fPos = glm::normalize(PointNew3.fPos);
             PointNew3.fPos = PointNew3.fPos * m_fRadius;
 
-			m_vecTriangleList[1 - m_nArrayResult]->push_back(CTriangle(Point1, PointNew2, PointNew3));
-			m_vecTriangleList[1 - m_nArrayResult]->push_back(CTriangle(Point2, PointNew3, PointNew1));
-			m_vecTriangleList[1 - m_nArrayResult]->push_back(CTriangle(Point3, PointNew1, PointNew2));
-			m_vecTriangleList[1 - m_nArrayResult]->push_back(CTriangle(PointNew1, PointNew3, PointNew2));
+			m_vecTriangleList[1 - m_nArrayResult]->push_back(CTriangle(Point1,    PointNew3, PointNew2));
+			m_vecTriangleList[1 - m_nArrayResult]->push_back(CTriangle(Point2,    PointNew1, PointNew3));
+			m_vecTriangleList[1 - m_nArrayResult]->push_back(CTriangle(Point3,    PointNew2, PointNew1));
+			m_vecTriangleList[1 - m_nArrayResult]->push_back(CTriangle(PointNew1, PointNew2, PointNew3));
 		}
 		m_nArrayResult = 1 - m_nArrayResult;
 	}
 	ComputeTextureCoordinates();
     ComputeTangentBitangent();
 }
+
+
 
 /*
 float CalculateAngle(float fX, float fY)
@@ -348,3 +355,21 @@ void CTriangleTesselation::GenerateTetraeder()
 
 
 }
+
+void CTriangleTesselation::GenerateGraph() {
+    for (size_t nIterator = 0; nIterator < this->GetTriangleList()->size(); ++nIterator) {
+        CTriangle::SPoint3D Point1 = *m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint1();
+        CTriangle::SPoint3D Point2 = *m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint2();
+        CTriangle::SPoint3D Point3 = *m_vecTriangleList[m_nArrayResult]->at(nIterator).GetPoint3();
+
+        //todo... triangle or points = vertexes? or save 3D points as vertexes?
+        //todo bidirectional ok, but points not unique and where is which face?
+        this->m_graph->addEdge(nIterator*3+0,nIterator*3+1,1); //P1 --> P2
+    }
+}
+
+const CGraph* CTriangleTesselation::GetGraph() const {
+    return this->m_graph;
+}
+
+
