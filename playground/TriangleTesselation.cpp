@@ -31,20 +31,26 @@ CTriangleTesselation::~CTriangleTesselation()
 
 void CTriangleTesselation::Tesselate(uint32_t nIterations)
 {
+    int vertexCounter;
 	for (size_t i = 0; i < nIterations;++i)
 	{
 		m_dualTriangleList[1 - m_nMeshSwitcher]->clear();
         this->m_nNVertices = this->m_nNVertices*4-6;
         m_dualGraph[1 - m_nGraphSwitcher]->reconstructGraph(m_nNVertices);
+        vertexCounter = 0;
 		for (size_t nIterator = 0; nIterator < m_dualTriangleList[m_nMeshSwitcher]->size(); ++nIterator)
 		{
 			CTriangle::SPoint3D PointNew1;
 			CTriangle::SPoint3D PointNew2;
 			CTriangle::SPoint3D PointNew3;
 
+            std::vector<int> vertexTripleNew;
+
 			CTriangle::SPoint3D Point1 = *m_dualTriangleList[m_nMeshSwitcher]->at(nIterator).GetPoint1();
 			CTriangle::SPoint3D Point2 = *m_dualTriangleList[m_nMeshSwitcher]->at(nIterator).GetPoint2();
 			CTriangle::SPoint3D Point3 = *m_dualTriangleList[m_nMeshSwitcher]->at(nIterator).GetPoint3();
+
+            std::vector<int> vertexTriple = m_dualGraph[m_nGraphSwitcher]->getPointsofTriangle(nIterator);
 
             PointNew1.fPos = (Point2.fPos + Point3.fPos) / 2.0f;
             PointNew1.fPos = glm::normalize(PointNew1.fPos);
@@ -57,6 +63,15 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
             PointNew3.fPos = (Point1.fPos + Point2.fPos) / 2.0f;
             PointNew3.fPos = glm::normalize(PointNew3.fPos);
             PointNew3.fPos = PointNew3.fPos * m_fRadius;
+
+
+            for(int t = 0; t<3; t++) {
+                //todo generate graph just in last for loop?
+                //if(vertexTriple[0]) {
+                    vertexCounter++;
+                    vertexTripleNew[t] = m_dualGraph[m_nGraphSwitcher]->getSize() + vertexCounter;
+                //}
+            }
 
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point1,    PointNew3, PointNew2));
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point2,    PointNew1, PointNew3));

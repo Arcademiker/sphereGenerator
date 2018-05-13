@@ -17,6 +17,7 @@
 CGraph::CGraph(const unsigned int size) {
     this->size = size;
     this->G = new std::vector<std::vector<std::pair<int,int>>>(size);
+    this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
 }
 
 CGraph::~CGraph() {
@@ -35,7 +36,7 @@ void CGraph::addTriangle(unsigned int point1, unsigned int point2, unsigned int 
     addEdge(point1, point2, 1);
     addEdge(point2, point3, 1);
     addEdge(point3, point1, 1);
-    //this->m_vecPointofTraingle[triangle] = point1;
+    this->m_matPointsofTraingle[triangle].push_back({point1,point2,point3});
 }
 
 void CGraph::reconstructGraph(int size) {
@@ -51,6 +52,16 @@ void CGraph::printGraph() {
         }
         std::printf("\n");
     }
+}
+
+std::vector<int> CGraph::getPointsofTriangle(size_t triangleID) {
+    //todo this performs a deep copy for the case this datastructure gets more complex
+    std::vector<int> triangle((*m_matPointsofTraingle)[triangleID]);
+    return triangle;
+}
+
+int CGraph::getSize() {
+    return this->size;
 }
 
 

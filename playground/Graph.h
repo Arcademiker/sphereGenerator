@@ -10,7 +10,7 @@
 class CGraph {
 private:
     std::vector<std::vector<std::pair<int,int>>>* G;
-    std::vector<int>* m_vecPointofTraingle;
+    std::vector<std::vector<int>>* m_matPointsofTraingle;
     unsigned int size;
 
 public:
@@ -19,6 +19,8 @@ public:
     void addEdge(int u, int v, int w);
     void addTriangle(unsigned int point1,unsigned int point2,unsigned int point3, unsigned int triangle);
     void reconstructGraph(int size);
+    std::vector<int> getPointsofTriangle(size_t triangleID);
+    int getSize();
 
     void printGraph();
 };
