@@ -15,6 +15,7 @@
 
 
 CGraph::CGraph(const unsigned int size) {
+    this->size = size;
     this->G = new std::vector<std::vector<std::pair<int,int>>>(size);
 }
 
@@ -30,10 +31,16 @@ void CGraph::addEdge(int u, int v, int w) {
 }
 
 
-void CGraph::addTriangle(unsigned int point1, unsigned int point2, unsigned int point3) {
+void CGraph::addTriangle(unsigned int point1, unsigned int point2, unsigned int point3, unsigned int triangle) {
     addEdge(point1, point2, 1);
     addEdge(point2, point3, 1);
     addEdge(point3, point1, 1);
+    //this->m_vecPointofTraingle[triangle] = point1;
+}
+
+void CGraph::reconstructGraph(int size) {
+    delete this->G;
+    this->G = new std::vector<std::vector<std::pair<int,int>>>(size);
 }
 
 void CGraph::printGraph() {
@@ -45,6 +52,8 @@ void CGraph::printGraph() {
         std::printf("\n");
     }
 }
+
+
 
 
 

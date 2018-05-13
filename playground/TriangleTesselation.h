@@ -15,6 +15,7 @@ public:
 	void Tesselate(uint32_t nIterations = 5);
 	const std::vector<CTriangle>* GetTriangleList() const;
     CGraph* GetGraph();
+    //int updateNVertices() { this->m_nNVertices = this->m_nNVertices*4-6; }
 
 private:
 
@@ -25,10 +26,13 @@ private:
     void ComputePointTangent(CTriangle::SPoint3D *Point);
 
 
-	size_t m_nArrayResult = 0;
+	size_t m_nMeshSwitcher = 0;
 	float m_fRadius = 1.0f;
-	std::vector<CTriangle>* m_vecTriangleList[2];
-    CGraph* m_graph;
-    unsigned int m_nVertices = 12;
+	std::vector<CTriangle>* m_dualTriangleList[2];
+    
+    size_t m_nGraphSwitcher = 0;
+    CGraph* m_dualGraph[2];
+    //CGraph* m_graph;
+    unsigned int m_nNVertices = 12;
 };
 
