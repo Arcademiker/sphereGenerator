@@ -63,16 +63,19 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
             PointNew3.fPos = (Point1.fPos + Point2.fPos) / 2.0f;
             PointNew3.fPos = glm::normalize(PointNew3.fPos);
             PointNew3.fPos = PointNew3.fPos * m_fRadius;
-
-
+            /*
+            //check edge of adjazent triangle (add inner edges in adjazent triangle tesselation step)
             for(int t = 0; t<3; t++) {
-                //todo generate graph just in last for loop?
-                //if(vertexTriple[0]) {
+                //does vertex already exist
+                if(m_dualGraph[m_nGraphSwitcher]->getEdge(vertexTriple[0])) {
                     vertexCounter++;
                     vertexTripleNew[t] = m_dualGraph[m_nGraphSwitcher]->getSize() + vertexCounter;
-                //}
+                }
+                else {
+                    //m_dualGraph[1-m_nGraphSwitcher]
+                }
             }
-
+            */
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point1,    PointNew3, PointNew2));
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point2,    PointNew1, PointNew3));
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point3,    PointNew2, PointNew1));
@@ -376,17 +379,17 @@ void CTriangleTesselation::GenerateTetraeder()
 
     //create logical triangle for graph traversal A=10, B=11, C=0
     //northpol
-    this->m_dualGraph[0]->addTriangle( 7,  5,  1, 0);
-    this->m_dualGraph[0]->addTriangle( 7,  2,  5, 1);
-    this->m_dualGraph[0]->addTriangle( 7,  0,  2, 2);
-    this->m_dualGraph[0]->addTriangle( 7, 10,  0, 3);
-    this->m_dualGraph[0]->addTriangle( 7,  1, 10, 4);
+    this->m_dualGraph[0]->addTriangle( 7,  5,  1,  0);
+    this->m_dualGraph[0]->addTriangle( 7,  2,  5,  1);
+    this->m_dualGraph[0]->addTriangle( 7,  0,  2,  2);
+    this->m_dualGraph[0]->addTriangle( 7, 10,  0,  3);
+    this->m_dualGraph[0]->addTriangle( 7,  1, 10,  4);
     //southpol
-    this->m_dualGraph[0]->addTriangle( 6,  4,  8, 5);
-    this->m_dualGraph[0]->addTriangle( 6,  8,  3, 6);
-    this->m_dualGraph[0]->addTriangle( 6,  3,  9, 7);
-    this->m_dualGraph[0]->addTriangle( 6,  9, 11, 8);
-    this->m_dualGraph[0]->addTriangle( 6, 11,  4, 9);
+    this->m_dualGraph[0]->addTriangle( 6,  4,  8,  5);
+    this->m_dualGraph[0]->addTriangle( 6,  8,  3,  6);
+    this->m_dualGraph[0]->addTriangle( 6,  3,  9,  7);
+    this->m_dualGraph[0]->addTriangle( 6,  9, 11,  8);
+    this->m_dualGraph[0]->addTriangle( 6, 11,  4,  9);
     //belt
     this->m_dualGraph[0]->addTriangle(10,  8,  0, 10);
     this->m_dualGraph[0]->addTriangle( 8,  4,  0, 11);
@@ -414,6 +417,7 @@ void CTriangleTesselation::GenerateGraph() {
 
         //todo extract triangle list (with or without id)
         //todo connect face indexes to point index
+        //todo 1--new--2 go in 2 find 1
         //this->m_graph->addEdge(nIterator*3+0,nIterator*3+1,1); //P1 --> P2
     }
 }

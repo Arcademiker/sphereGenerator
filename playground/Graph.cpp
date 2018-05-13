@@ -64,6 +64,10 @@ int CGraph::getSize() {
     return this->size;
 }
 
+std::vector<std::pair<int, int>> CGraph::getEdge(unsigned int u) {
+    return this->G->at(u);
+}
+
 
 
 
