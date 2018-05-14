@@ -31,27 +31,29 @@ CTriangleTesselation::~CTriangleTesselation()
 
 void CTriangleTesselation::Tesselate(uint32_t nIterations)
 {
-    //int vertexCounter;
+    int oldGraphSize;
+    int tmpEdgeID;
 	for (size_t i = 0; i < nIterations;++i)
 	{
 		m_dualTriangleList[1 - m_nMeshSwitcher]->clear();
-        //this->m_nNVertices = this->m_nNVertices*4-6;
-        //m_dualGraph[1 - m_nGraphSwitcher]->reconstructGraph(m_nNVertices);
-        //vertexCounter = 0;
-        ///edgecounter
+        oldGraphSize = static_cast<int>(m_dualGraph[m_nGraphSwitcher]->getSize());
+        this->m_nNVertices = this->m_nNVertices*4-6;
+        m_dualGraph[1 - m_nGraphSwitcher]->reconstructGraph(m_nNVertices);
+
 		for (size_t nIterator = 0; nIterator < m_dualTriangleList[m_nMeshSwitcher]->size(); ++nIterator)
 		{
 			CTriangle::SPoint3D PointNew1;
 			CTriangle::SPoint3D PointNew2;
 			CTriangle::SPoint3D PointNew3;
 
-            //std::vector<int> vertexTripleNew;
+            std::vector<int> vertexTripleNew(3);
 
 			CTriangle::SPoint3D Point1 = *m_dualTriangleList[m_nMeshSwitcher]->at(nIterator).GetPoint1();
 			CTriangle::SPoint3D Point2 = *m_dualTriangleList[m_nMeshSwitcher]->at(nIterator).GetPoint2();
 			CTriangle::SPoint3D Point3 = *m_dualTriangleList[m_nMeshSwitcher]->at(nIterator).GetPoint3();
 
-            //std::vector<unsigned int> vertexTriple = m_dualGraph[m_nGraphSwitcher]->getPointsofTriangle(nIterator);
+            std::vector<int> vertexTriple = m_dualGraph[m_nGraphSwitcher]->getPointsofTriangle(nIterator);
+            //std::cout << vertexTriple[0] << vertexTriple[1] << vertexTriple[2] << std::endl;
 
             PointNew1.fPos = (Point2.fPos + Point3.fPos) / 2.0f;
             PointNew1.fPos = glm::normalize(PointNew1.fPos);
@@ -64,26 +66,33 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
             PointNew3.fPos = (Point1.fPos + Point2.fPos) / 2.0f;
             PointNew3.fPos = glm::normalize(PointNew3.fPos);
             PointNew3.fPos = PointNew3.fPos * m_fRadius;
-            /*
-            //check edge of adjazent triangle (add inner edges in adjazent triangle tesselation step)
+
+
+            //check edge of adjacent triangle (add inner edges in adjazent triangle tesselation step)
             for(int t = 0; t<3; t++) {
                 //does vertex already exist
-                if(m_dualGraph[m_nGraphSwitcher]->getEdge(vertexTriple[0])) {
-                    vertexCounter++;
-                    vertexTripleNew[t] = m_dualGraph[m_nGraphSwitcher]->getSize() + vertexCounter;
-                }
-                else {
+                //new vertex ID
+                tmpEdgeID = std::abs(m_dualGraph[m_nGraphSwitcher]->getAdjacent(vertexTriple[t])[vertexTriple[(t+1)%3]]);
+                //if(m_dualGraph[1 - m_nGraphSwitcher][tmpVertexID]) { //just push in and connect it will be save
+                vertexTripleNew[t] = oldGraphSize + tmpEdgeID;
+                std::cout << vertexTripleNew[t] << " ";
+                //}
+                //else {
                     //m_dualGraph[1-m_nGraphSwitcher]
-                }
+                //}
             }
-            */
+            std::cout << " in " << nIterator << std::endl;
+
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point1,    PointNew3, PointNew2));
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point2,    PointNew1, PointNew3));
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point3,    PointNew2, PointNew1));
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(PointNew1, PointNew2, PointNew3));
+
+            //insert into 1-graphswitcher!
 		}
 		m_nMeshSwitcher = 1 - m_nMeshSwitcher;
-        //m_nGraphSwitcher = 1 - m_nGraphSwitcher;
+        m_nGraphSwitcher = 1 - m_nGraphSwitcher;
+        std::cout << "!" << nIterations << std::endl;
 	}
 	ComputeTextureCoordinates();
     ComputeTangentBitangent();
@@ -381,9 +390,6 @@ void CTriangleTesselation::GenerateTetraeder()
 
     //create logical triangle for graph traversal A=10, B=11, C=0
     //northpol
-    //this->m_dualGraph[0]->addTriangle( 7,  0,  3,  0); //test
-
-
     this->m_dualGraph[0]->addTriangle( 7,  5,  1,  0);
     this->m_dualGraph[0]->addTriangle( 7,  2,  5,  1);
     this->m_dualGraph[0]->addTriangle( 7,  0,  2,  2);

@@ -18,7 +18,7 @@ CGraph::CGraph(size_t size) {
     this->size = size;
     this->G = new std::vector<std::unordered_map<int,int>>(size,std::unordered_map<int,int>(6));
     //this->G = std::vector<std::unordered_map<int,int>>();
-    this->m_matPointsofTraingle = new std::vector<std::vector<unsigned int>>;
+    this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
     this->edgeCounter = 1;
 }
@@ -38,6 +38,7 @@ bool CGraph::addEdge(int u, int v, int w) {
     //itAdjcent = G->at(u).insert(std::make_pair(v, 0));
     if(this->G->at(u).count(v)==0) // test if edge to u does not exist in v. average case const time
     {
+        //todo: more intelligent insertion check
         this->G->at(u).insert({v,edgeCounter}); // = edgeCounter;
         this->G->at(v).insert({u,-edgeCounter});
         (*this->m_edgeList)[edgeCounter] = u; //pair for weights w
@@ -45,29 +46,29 @@ bool CGraph::addEdge(int u, int v, int w) {
         edgeCounter++;
         //todo: add edge w=weight list
         //this->printGraph();
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
 
-void CGraph::addTriangle(unsigned int point1, unsigned int point2, unsigned int point3, unsigned int triangleID) {
+void CGraph::addTriangle(int point1, int point2, int point3, int triangleID) {
 
     addEdge(point1, point2,1);
 
     addEdge(point2, point3,1);
 
     addEdge(point3, point1,1);
-    //std::vector<unsigned int> triangle {point1,point2,point3};
-    //this->m_matPointsofTraingle[triangleID].push_back({point1,point2,point3});
+    std::vector<int> triangle {point1,point2,point3};
+    this->m_matPointsofTraingle->push_back(triangle);
 }
 
-void CGraph::reconstructGraph(unsigned int size) {
+void CGraph::reconstructGraph(size_t size) {
     delete this->G;
     delete this->m_matPointsofTraingle;
     delete this->m_edgeList;
-    this->G = new std::vector<std::unordered_map<int,int>>(size);
-    this->m_matPointsofTraingle = new std::vector<std::vector<unsigned int>>;
+    this->G = new std::vector<std::unordered_map<int,int>>(size,std::unordered_map<int,int>(6));
+    this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
     this->edgeCounter = 0;
 }
@@ -82,22 +83,22 @@ void CGraph::printGraph() {
     }
 }
 
-std::vector<unsigned int> CGraph::getPointsofTriangle(size_t triangleID) {
+std::vector<int> CGraph::getPointsofTriangle(int triangleID) {
     //todo this performs a deep copy for the case this datastructure gets more complex
-    std::vector<unsigned int> triangle((*m_matPointsofTraingle)[triangleID]);
+    std::vector<int> triangle((*m_matPointsofTraingle)[triangleID]);
     return triangle;
 }
 
-int CGraph::getSize() {
+size_t CGraph::getSize() {
     return this->size;
 }
 
-int CGraph::getEdge(unsigned int e) {
+int CGraph::getVerticesOfEdge(int e) {
     //todo return edge pointing on vertex withing specific triangle
     return this->m_edgeList->at(e);
 }
 
-std::unordered_map<int,int> CGraph::getAdjacent(unsigned int u) {
+std::unordered_map<int,int> CGraph::getAdjacent(int u) {
     return this->G->at(u);
 }
 

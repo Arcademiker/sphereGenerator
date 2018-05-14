@@ -196,6 +196,22 @@ int main( )
     loadImage_SOIL(textures,"../playground/earth16cities4.jpg",4);
     GLuint Texture2ID  = glGetUniformLocation(programID, "myTexture2");
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /// generate sphere object:
     CTriangleTesselation TriangleTesselation(0.5f,1);
     //TriangleTesselation.Tesselate(1);
@@ -204,14 +220,35 @@ int main( )
     std::cout << "shown faces: " << triangles->size();
 
     ///test Graph
-    TriangleTesselation.GetGraph()->printGraph();
-	for(int i= 1 ; i<=30; i++)
+    //TriangleTesselation.GetGraph()->printGraph();
+	for(int i=1; i<=30; i++)
 	{
-		std::cout << TriangleTesselation.GetGraph()->getEdge(i) << "\t--\t" <<  TriangleTesselation.GetGraph()->getEdge(-i) << std::endl;
+		//std::cout << TriangleTesselation.GetGraph()->getVerticesOfEdge(i)
+        // << "\t--\t" << TriangleTesselation.GetGraph()->getVerticesOfEdge(-i) << std::endl;
 	}
+    /*
+    for(int i=0; i<triangles->size();i++) {
+        std::cout << TriangleTesselation.GetGraph()->getPointsofTriangle(i).at(0) << ","
+                  << TriangleTesselation.GetGraph()->getPointsofTriangle(i).at(1) << ","
+                  << TriangleTesselation.GetGraph()->getPointsofTriangle(i).at(2)
+                  << std::endl;
+    }
+    */
+
 
     //std::vector<CTriangle> tmp = *triangles;
     //std::cout << tmp.at(0).GetPoint1()->fY << std::endl;
+
+
+
+
+
+
+
+
+
+
+
 
     // Read our .obj file
 	//std::vector<glm::vec3> vertices;
@@ -219,6 +256,7 @@ int main( )
 	//std::vector<glm::vec3> normals; // Won't be used at the moment.
 	//bool res = loadOBJ("../playground/cube.obj", vertices, uvs, normals);
     ///bool res = loadOBJ(triangles, vertices, uvs, normals);
+
 
 	// Load it into a VBO
 
