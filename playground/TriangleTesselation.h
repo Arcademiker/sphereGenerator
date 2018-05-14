@@ -33,6 +33,6 @@ private:
     size_t m_nGraphSwitcher = 0;
     CGraph* m_dualGraph[2];
     //CGraph* m_graph;
-    unsigned int m_nNVertices = 12;
+    size_t m_nNVertices = 12;
 };
 

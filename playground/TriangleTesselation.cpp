@@ -11,9 +11,9 @@ CTriangleTesselation::CTriangleTesselation(float fRadius, uint32_t nIterations)
 	m_dualTriangleList[0] = new std::vector<CTriangle>();
 	m_dualTriangleList[1] = new std::vector<CTriangle>();
 
-    ///this->m_dualGraph[0] = new CGraph(this->m_nNVertices);
-    ///this->m_nNVertices = this->m_nNVertices*4-6;
-    ///this->m_dualGraph[1] = new CGraph(this->m_nNVertices);
+    this->m_dualGraph[0] = new CGraph(this->m_nNVertices);
+    this->m_nNVertices = this->m_nNVertices*4-6;
+    this->m_dualGraph[1] = new CGraph(this->m_nNVertices);
 
     //GenerateGraph();
     GenerateTetraeder();
@@ -378,9 +378,12 @@ void CTriangleTesselation::GenerateTetraeder()
     m_dualTriangleList[0]->push_back(CTriangle(Point1, Point3, PointA));
     m_dualTriangleList[0]->push_back(CTriangle(Point3, Point8, PointA));
 
-    /*
+
     //create logical triangle for graph traversal A=10, B=11, C=0
     //northpol
+    //this->m_dualGraph[0]->addTriangle( 7,  0,  3,  0); //test
+
+
     this->m_dualGraph[0]->addTriangle( 7,  5,  1,  0);
     this->m_dualGraph[0]->addTriangle( 7,  2,  5,  1);
     this->m_dualGraph[0]->addTriangle( 7,  0,  2,  2);
@@ -403,7 +406,7 @@ void CTriangleTesselation::GenerateTetraeder()
     this->m_dualGraph[0]->addTriangle( 9,  3,  1, 17);
     this->m_dualGraph[0]->addTriangle( 1,  3, 10, 18);
     this->m_dualGraph[0]->addTriangle( 3,  8, 10, 19);
-    */
+
     //rim
     //m_dualTriangleList[0]->push_back(CTriangle(Point2, Point1, Point3));
     //m_dualTriangleList[0]->push_back(CTriangle(Point4, Point2, Point3));

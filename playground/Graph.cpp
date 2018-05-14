@@ -14,12 +14,13 @@
  */
 
 
-CGraph::CGraph(const unsigned int size) {
+CGraph::CGraph(size_t size) {
     this->size = size;
-    this->G = new std::vector<std::unordered_map<int,int>>(size);
+    this->G = new std::vector<std::unordered_map<int,int>>(size,std::unordered_map<int,int>(6));
+    //this->G = std::vector<std::unordered_map<int,int>>();
     this->m_matPointsofTraingle = new std::vector<std::vector<unsigned int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
-    this->edgeCounter = 0;
+    this->edgeCounter = 1;
 }
 
 CGraph::~CGraph() {
@@ -30,14 +31,23 @@ CGraph::~CGraph() {
 
 
 ///water low weight but land to water high cost
-void CGraph::addEdge(int u, int v, int e) {
+bool CGraph::addEdge(int u, int v, int w) {
     //e = edge id
-    //if(this->G->at(v)) test if u  exist
-    this->G->at(u).at(v) = edgeCounter;
-    //this->G->at(v).push_back({u,w});
-    this->m_edgeList->at(edgeCounter) = u;
-    this->m_edgeList->at(-edgeCounter) = v;
-    edgeCounter++;
+    //std::cout << "insert " << u << "--" << v << std::endl;
+    //int test = this->G->at(v).count(u);
+    //itAdjcent = G->at(u).insert(std::make_pair(v, 0));
+    if(this->G->at(u).count(v)==0) // test if edge to u does not exist in v. average case const time
+    {
+        this->G->at(u).insert({v,edgeCounter}); // = edgeCounter;
+        this->G->at(v).insert({u,-edgeCounter});
+        (*this->m_edgeList)[edgeCounter] = u; //pair for weights w
+        (*this->m_edgeList)[-edgeCounter] = v;
+        edgeCounter++;
+        //todo: add edge w=weight list
+        //this->printGraph();
+        return 1;
+    }
+    return 0;
 }
 
 
@@ -49,7 +59,7 @@ void CGraph::addTriangle(unsigned int point1, unsigned int point2, unsigned int 
 
     addEdge(point3, point1,1);
     //std::vector<unsigned int> triangle {point1,point2,point3};
-    this->m_matPointsofTraingle[triangleID].push_back({point1,point2,point3});
+    //this->m_matPointsofTraingle[triangleID].push_back({point1,point2,point3});
 }
 
 void CGraph::reconstructGraph(unsigned int size) {
@@ -82,9 +92,9 @@ int CGraph::getSize() {
     return this->size;
 }
 
-int CGraph::getEdge(unsigned int u, unsigned int triangleID) {
+int CGraph::getEdge(unsigned int e) {
     //todo return edge pointing on vertex withing specific triangle
-    return this->m_edgeList->find(u)->second;
+    return this->m_edgeList->at(e);
 }
 
 std::unordered_map<int,int> CGraph::getAdjacent(unsigned int u) {

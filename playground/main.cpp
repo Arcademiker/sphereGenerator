@@ -197,14 +197,18 @@ int main( )
     GLuint Texture2ID  = glGetUniformLocation(programID, "myTexture2");
 
     /// generate sphere object:
-    CTriangleTesselation TriangleTesselation(0.5f,0);
+    CTriangleTesselation TriangleTesselation(0.5f,1);
     //TriangleTesselation.Tesselate(1);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size();
 
     ///test Graph
-    //TriangleTesselation.GetGraph()->printGraph();
+    TriangleTesselation.GetGraph()->printGraph();
+	for(int i= 1 ; i<=30; i++)
+	{
+		std::cout << TriangleTesselation.GetGraph()->getEdge(i) << "\t--\t" <<  TriangleTesselation.GetGraph()->getEdge(-i) << std::endl;
+	}
 
     //std::vector<CTriangle> tmp = *triangles;
     //std::cout << tmp.at(0).GetPoint1()->fY << std::endl;

@@ -10,18 +10,18 @@
 
 class CGraph {
 private:
-    //std::vector<std::vector<std::pair<int,int>>>* G;
     std::vector<std::unordered_map<int,int>>* G;
+    //std::pair<std::unordered_map<int,int>::iterator, bool> itAdjcent;
     std::vector<std::vector<unsigned int>>* m_matPointsofTraingle;
     std::unordered_map<int,int>* m_edgeList;
-    unsigned int size;
+    size_t size;
     int edgeCounter;
 
 public:
-    explicit CGraph(unsigned int size);
+    CGraph(size_t size);
     ~CGraph();
-    void addEdge(int u, int v, int e);
-    int getEdge(unsigned int u, unsigned int triangleID);
+    bool addEdge(int u, int v, int w);
+    int getEdge(unsigned int e);
     std::unordered_map<int,int> getAdjacent(unsigned int u);
     void addTriangle(unsigned int point1,unsigned int point2,unsigned int point3, unsigned int triangleID);
     void reconstructGraph(unsigned int size);
@@ -31,3 +31,4 @@ public:
     void printGraph();
 };
 
+//std::vector<std::vector<std::pair<int,int>>>* G;
