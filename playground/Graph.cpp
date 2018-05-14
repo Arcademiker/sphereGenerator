@@ -16,7 +16,7 @@
 
 CGraph::CGraph(const unsigned int size) {
     this->size = size;
-    this->G = new std::vector<std::vector<std::pair<int,int>>>(size);
+    this->G = new std::vector<std::unordered_map<int,int>>(size);
     this->m_matPointsofTraingle = new std::vector<std::vector<unsigned int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
     this->edgeCounter = 0;
@@ -33,7 +33,7 @@ CGraph::~CGraph() {
 void CGraph::addEdge(int u, int v, int e) {
     //e = edge id
     //if(this->G->at(v)) test if u  exist
-    this->G->at(u).push_back({v,edgeCounter});
+    this->G->at(u).at(v) = edgeCounter;
     //this->G->at(v).push_back({u,w});
     this->m_edgeList->at(edgeCounter) = u;
     this->m_edgeList->at(-edgeCounter) = v;
@@ -56,7 +56,7 @@ void CGraph::reconstructGraph(unsigned int size) {
     delete this->G;
     delete this->m_matPointsofTraingle;
     delete this->m_edgeList;
-    this->G = new std::vector<std::vector<std::pair<int,int>>>(size);
+    this->G = new std::vector<std::unordered_map<int,int>>(size);
     this->m_matPointsofTraingle = new std::vector<std::vector<unsigned int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
     this->edgeCounter = 0;
@@ -87,7 +87,7 @@ int CGraph::getEdge(unsigned int u, unsigned int triangleID) {
     return this->m_edgeList->find(u)->second;
 }
 
-std::vector<std::pair<int, int>> CGraph::getAdjacent(unsigned int u) {
+std::unordered_map<int,int> CGraph::getAdjacent(unsigned int u) {
     return this->G->at(u);
 }
 
