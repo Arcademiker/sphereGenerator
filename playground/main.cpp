@@ -71,7 +71,8 @@ int main( )
     int resHeight = 1080;
 	window = glfwCreateWindow( resWidth, resHeight, "Tutorial 07 - Model Loading", NULL, NULL);
 	if( window == NULL ){
-		fprintf( stderr, "Failed to open GLFW window. If you have an older Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
+		fprintf( stderr, "Failed to open GLFW window. If you have an older Intel GPU, they are not 3.3 compatible."
+                " Try the 2.1 version of the tutorials.\n" );
 		getchar();
 		glfwTerminate();
 		return -1;
@@ -196,14 +197,14 @@ int main( )
     GLuint Texture2ID  = glGetUniformLocation(programID, "myTexture2");
 
     /// generate sphere object:
-    CTriangleTesselation TriangleTesselation(0.5f,2);
+    CTriangleTesselation TriangleTesselation(0.5f,0);
     //TriangleTesselation.Tesselate(1);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size();
 
     ///test Graph
-    TriangleTesselation.GetGraph()->printGraph();
+    //TriangleTesselation.GetGraph()->printGraph();
 
     //std::vector<CTriangle> tmp = *triangles;
     //std::cout << tmp.at(0).GetPoint1()->fY << std::endl;

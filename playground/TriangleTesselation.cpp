@@ -11,9 +11,9 @@ CTriangleTesselation::CTriangleTesselation(float fRadius, uint32_t nIterations)
 	m_dualTriangleList[0] = new std::vector<CTriangle>();
 	m_dualTriangleList[1] = new std::vector<CTriangle>();
 
-    this->m_dualGraph[0] = new CGraph(this->m_nNVertices);
-    this->m_nNVertices = this->m_nNVertices*4-6;
-    this->m_dualGraph[1] = new CGraph(this->m_nNVertices);
+    ///this->m_dualGraph[0] = new CGraph(this->m_nNVertices);
+    ///this->m_nNVertices = this->m_nNVertices*4-6;
+    ///this->m_dualGraph[1] = new CGraph(this->m_nNVertices);
 
     //GenerateGraph();
     GenerateTetraeder();
@@ -31,26 +31,27 @@ CTriangleTesselation::~CTriangleTesselation()
 
 void CTriangleTesselation::Tesselate(uint32_t nIterations)
 {
-    int vertexCounter;
+    //int vertexCounter;
 	for (size_t i = 0; i < nIterations;++i)
 	{
 		m_dualTriangleList[1 - m_nMeshSwitcher]->clear();
-        this->m_nNVertices = this->m_nNVertices*4-6;
-        m_dualGraph[1 - m_nGraphSwitcher]->reconstructGraph(m_nNVertices);
-        vertexCounter = 0;
+        //this->m_nNVertices = this->m_nNVertices*4-6;
+        //m_dualGraph[1 - m_nGraphSwitcher]->reconstructGraph(m_nNVertices);
+        //vertexCounter = 0;
+        ///edgecounter
 		for (size_t nIterator = 0; nIterator < m_dualTriangleList[m_nMeshSwitcher]->size(); ++nIterator)
 		{
 			CTriangle::SPoint3D PointNew1;
 			CTriangle::SPoint3D PointNew2;
 			CTriangle::SPoint3D PointNew3;
 
-            std::vector<int> vertexTripleNew;
+            //std::vector<int> vertexTripleNew;
 
 			CTriangle::SPoint3D Point1 = *m_dualTriangleList[m_nMeshSwitcher]->at(nIterator).GetPoint1();
 			CTriangle::SPoint3D Point2 = *m_dualTriangleList[m_nMeshSwitcher]->at(nIterator).GetPoint2();
 			CTriangle::SPoint3D Point3 = *m_dualTriangleList[m_nMeshSwitcher]->at(nIterator).GetPoint3();
 
-            std::vector<int> vertexTriple = m_dualGraph[m_nGraphSwitcher]->getPointsofTriangle(nIterator);
+            //std::vector<unsigned int> vertexTriple = m_dualGraph[m_nGraphSwitcher]->getPointsofTriangle(nIterator);
 
             PointNew1.fPos = (Point2.fPos + Point3.fPos) / 2.0f;
             PointNew1.fPos = glm::normalize(PointNew1.fPos);
@@ -82,7 +83,7 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(PointNew1, PointNew2, PointNew3));
 		}
 		m_nMeshSwitcher = 1 - m_nMeshSwitcher;
-        m_nGraphSwitcher = 1 - m_nGraphSwitcher;
+        //m_nGraphSwitcher = 1 - m_nGraphSwitcher;
 	}
 	ComputeTextureCoordinates();
     ComputeTangentBitangent();
@@ -377,6 +378,7 @@ void CTriangleTesselation::GenerateTetraeder()
     m_dualTriangleList[0]->push_back(CTriangle(Point1, Point3, PointA));
     m_dualTriangleList[0]->push_back(CTriangle(Point3, Point8, PointA));
 
+    /*
     //create logical triangle for graph traversal A=10, B=11, C=0
     //northpol
     this->m_dualGraph[0]->addTriangle( 7,  5,  1,  0);
@@ -401,7 +403,7 @@ void CTriangleTesselation::GenerateTetraeder()
     this->m_dualGraph[0]->addTriangle( 9,  3,  1, 17);
     this->m_dualGraph[0]->addTriangle( 1,  3, 10, 18);
     this->m_dualGraph[0]->addTriangle( 3,  8, 10, 19);
-
+    */
     //rim
     //m_dualTriangleList[0]->push_back(CTriangle(Point2, Point1, Point3));
     //m_dualTriangleList[0]->push_back(CTriangle(Point4, Point2, Point3));
