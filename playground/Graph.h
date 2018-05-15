@@ -28,6 +28,7 @@ public:
     void reconstructGraph(size_t size);
     std::vector<int> getPointsofTriangle(int triangleID);
     size_t getSize();
+    int getNTriangles();
 
     void printGraph();
 };

@@ -213,7 +213,7 @@ int main( )
 
 
     /// generate sphere object:
-    CTriangleTesselation TriangleTesselation(0.5f,1);
+    CTriangleTesselation TriangleTesselation(0.5f,3);
     //TriangleTesselation.Tesselate(1);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 

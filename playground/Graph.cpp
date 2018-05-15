@@ -74,6 +74,7 @@ void CGraph::reconstructGraph(size_t size) {
     this->m_edgeList = new std::unordered_map<int,int>;
     this->edgeCounter = 1;
     this->edgeCounter = 0;
+    this->size = size;
 }
 
 void CGraph::printGraph() {
@@ -103,6 +104,10 @@ int CGraph::getVerticesOfEdge(int e) {
 
 std::unordered_map<int,int> CGraph::getAdjacent(int u) {
     return this->G->at(u);
+}
+
+int CGraph::getNTriangles() {
+    return this->triangleCounter;
 }
 
 

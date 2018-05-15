@@ -31,12 +31,12 @@ CTriangleTesselation::~CTriangleTesselation()
 
 void CTriangleTesselation::Tesselate(uint32_t nIterations)
 {
-    int oldGraphSize;
+    int oldGraphSize = static_cast<int>(m_dualGraph[m_nGraphSwitcher]->getSize())-1;
     int tmpEdgeID;
 	for (size_t i = 0; i < nIterations;++i)
 	{
 		m_dualTriangleList[1 - m_nMeshSwitcher]->clear();
-        oldGraphSize = static_cast<int>(m_dualGraph[m_nGraphSwitcher]->getSize())-1;
+
         this->m_nNVertices = this->m_nNVertices*4-6;
         m_dualGraph[1 - m_nGraphSwitcher]->reconstructGraph(m_nNVertices);
 
@@ -72,7 +72,7 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
             for(int t = 0; t<3; t++) {
                 //does vertex already exist
                 //new vertex ID
-                tmpEdgeID = std::abs(m_dualGraph[m_nGraphSwitcher]->getAdjacent(vertexTriple[(t+1)%3])[vertexTriple[(t+2)%3]]);
+                tmpEdgeID = std::abs(m_dualGraph[m_nGraphSwitcher]->getAdjacent( vertexTriple[ (t+1)%3 ] )[ vertexTriple[ (t+2)%3 ] ]);
                 //if(m_dualGraph[1 - m_nGraphSwitcher][tmpVertexID]) { //just push in and connect it will be save
                 vertexTripleNew[t] = oldGraphSize + tmpEdgeID;
                 std::cout << vertexTripleNew[t] << " ";
@@ -95,9 +95,11 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 
             //insert into 1-graphswitcher!
 		}
+        oldGraphSize = static_cast<int>(m_dualGraph[1- m_nGraphSwitcher]->getSize());
+        std::cout << "!" << i << " " << m_dualTriangleList[m_nMeshSwitcher]->size() << ", " << m_dualGraph[m_nGraphSwitcher]->getSize() << ", " << m_dualGraph[m_nGraphSwitcher]->getNTriangles() << std::endl;
 		m_nMeshSwitcher = 1 - m_nMeshSwitcher;
         m_nGraphSwitcher = 1 - m_nGraphSwitcher;
-        std::cout << "!" << nIterations << std::endl;
+        std::cout << "!" << i << " " << m_dualTriangleList[m_nMeshSwitcher]->size() << ", " << m_dualGraph[m_nGraphSwitcher]->getSize() << ", " << m_dualGraph[m_nGraphSwitcher]->getNTriangles() << std::endl;
 	}
 	ComputeTextureCoordinates();
     ComputeTangentBitangent();
