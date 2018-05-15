@@ -220,7 +220,7 @@ int main( )
     std::cout << "shown faces: " << triangles->size();
 
     ///test Graph
-    //TriangleTesselation.GetGraph()->printGraph();
+    TriangleTesselation.GetGraph()->printGraph();
 	for(int i=1; i<=30; i++)
 	{
 		//std::cout << TriangleTesselation.GetGraph()->getVerticesOfEdge(i)

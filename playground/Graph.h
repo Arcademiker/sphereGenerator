@@ -16,6 +16,7 @@ private:
     std::unordered_map<int,int>* m_edgeList;
     size_t size;
     int edgeCounter;
+    int triangleCounter;
 
 public:
     CGraph(size_t size);
@@ -23,7 +24,7 @@ public:
     bool addEdge(int u, int v, int w);
     int getVerticesOfEdge(int e);
     std::unordered_map<int,int> getAdjacent(int u);
-    void addTriangle(int point1,int point2,int point3, int triangleID);
+    void addTriangle(int point1,int point2,int point3);
     void reconstructGraph(size_t size);
     std::vector<int> getPointsofTriangle(int triangleID);
     size_t getSize();

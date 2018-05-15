@@ -21,6 +21,7 @@ CGraph::CGraph(size_t size) {
     this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
     this->edgeCounter = 1;
+    this->triangleCounter = 0;
 }
 
 CGraph::~CGraph() {
@@ -52,7 +53,7 @@ bool CGraph::addEdge(int u, int v, int w) {
 }
 
 
-void CGraph::addTriangle(int point1, int point2, int point3, int triangleID) {
+void CGraph::addTriangle(int point1, int point2, int point3) {
 
     addEdge(point1, point2,1);
 
@@ -61,6 +62,7 @@ void CGraph::addTriangle(int point1, int point2, int point3, int triangleID) {
     addEdge(point3, point1,1);
     std::vector<int> triangle {point1,point2,point3};
     this->m_matPointsofTraingle->push_back(triangle);
+    this->triangleCounter++;
 }
 
 void CGraph::reconstructGraph(size_t size) {
@@ -70,6 +72,7 @@ void CGraph::reconstructGraph(size_t size) {
     this->G = new std::vector<std::unordered_map<int,int>>(size,std::unordered_map<int,int>(6));
     this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
+    this->edgeCounter = 1;
     this->edgeCounter = 0;
 }
 

@@ -12,7 +12,7 @@ CTriangleTesselation::CTriangleTesselation(float fRadius, uint32_t nIterations)
 	m_dualTriangleList[1] = new std::vector<CTriangle>();
 
     this->m_dualGraph[0] = new CGraph(this->m_nNVertices);
-    this->m_nNVertices = this->m_nNVertices*4-6;
+    //this->m_nNVertices = this->m_nNVertices*4-6;
     this->m_dualGraph[1] = new CGraph(this->m_nNVertices);
 
     //GenerateGraph();
@@ -36,7 +36,7 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 	for (size_t i = 0; i < nIterations;++i)
 	{
 		m_dualTriangleList[1 - m_nMeshSwitcher]->clear();
-        oldGraphSize = static_cast<int>(m_dualGraph[m_nGraphSwitcher]->getSize());
+        oldGraphSize = static_cast<int>(m_dualGraph[m_nGraphSwitcher]->getSize())-1;
         this->m_nNVertices = this->m_nNVertices*4-6;
         m_dualGraph[1 - m_nGraphSwitcher]->reconstructGraph(m_nNVertices);
 
@@ -72,7 +72,7 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
             for(int t = 0; t<3; t++) {
                 //does vertex already exist
                 //new vertex ID
-                tmpEdgeID = std::abs(m_dualGraph[m_nGraphSwitcher]->getAdjacent(vertexTriple[t])[vertexTriple[(t+1)%3]]);
+                tmpEdgeID = std::abs(m_dualGraph[m_nGraphSwitcher]->getAdjacent(vertexTriple[(t+1)%3])[vertexTriple[(t+2)%3]]);
                 //if(m_dualGraph[1 - m_nGraphSwitcher][tmpVertexID]) { //just push in and connect it will be save
                 vertexTripleNew[t] = oldGraphSize + tmpEdgeID;
                 std::cout << vertexTripleNew[t] << " ";
@@ -87,6 +87,11 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point2,    PointNew1, PointNew3));
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point3,    PointNew2, PointNew1));
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(PointNew1, PointNew2, PointNew3));
+
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[0], vertexTripleNew[2], vertexTripleNew[1]);
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[1], vertexTripleNew[0], vertexTripleNew[2]);
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[2], vertexTripleNew[1], vertexTripleNew[0]);
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTripleNew[0], vertexTripleNew[1], vertexTripleNew[2]);
 
             //insert into 1-graphswitcher!
 		}
@@ -390,28 +395,28 @@ void CTriangleTesselation::GenerateTetraeder()
 
     //create logical triangle for graph traversal A=10, B=11, C=0
     //northpol
-    this->m_dualGraph[0]->addTriangle( 7,  5,  1,  0);
-    this->m_dualGraph[0]->addTriangle( 7,  2,  5,  1);
-    this->m_dualGraph[0]->addTriangle( 7,  0,  2,  2);
-    this->m_dualGraph[0]->addTriangle( 7, 10,  0,  3);
-    this->m_dualGraph[0]->addTriangle( 7,  1, 10,  4);
+    this->m_dualGraph[0]->addTriangle( 7,  5,  1);
+    this->m_dualGraph[0]->addTriangle( 7,  2,  5);
+    this->m_dualGraph[0]->addTriangle( 7,  0,  2);
+    this->m_dualGraph[0]->addTriangle( 7, 10,  0);
+    this->m_dualGraph[0]->addTriangle( 7,  1, 10);
     //southpol
-    this->m_dualGraph[0]->addTriangle( 6,  4,  8,  5);
-    this->m_dualGraph[0]->addTriangle( 6,  8,  3,  6);
-    this->m_dualGraph[0]->addTriangle( 6,  3,  9,  7);
-    this->m_dualGraph[0]->addTriangle( 6,  9, 11,  8);
-    this->m_dualGraph[0]->addTriangle( 6, 11,  4,  9);
+    this->m_dualGraph[0]->addTriangle( 6,  4,  8);
+    this->m_dualGraph[0]->addTriangle( 6,  8,  3);
+    this->m_dualGraph[0]->addTriangle( 6,  3,  9);
+    this->m_dualGraph[0]->addTriangle( 6,  9, 11);
+    this->m_dualGraph[0]->addTriangle( 6, 11,  4);
     //belt
-    this->m_dualGraph[0]->addTriangle(10,  8,  0, 10);
-    this->m_dualGraph[0]->addTriangle( 8,  4,  0, 11);
-    this->m_dualGraph[0]->addTriangle( 0,  4,  2, 12);
-    this->m_dualGraph[0]->addTriangle( 4, 11,  2, 13);
-    this->m_dualGraph[0]->addTriangle( 2, 11,  5, 14);
-    this->m_dualGraph[0]->addTriangle(11,  9,  5, 15);
-    this->m_dualGraph[0]->addTriangle( 5,  9,  1, 16);
-    this->m_dualGraph[0]->addTriangle( 9,  3,  1, 17);
-    this->m_dualGraph[0]->addTriangle( 1,  3, 10, 18);
-    this->m_dualGraph[0]->addTriangle( 3,  8, 10, 19);
+    this->m_dualGraph[0]->addTriangle(10,  8,  0);
+    this->m_dualGraph[0]->addTriangle( 8,  4,  0);
+    this->m_dualGraph[0]->addTriangle( 0,  4,  2);
+    this->m_dualGraph[0]->addTriangle( 4, 11,  2);
+    this->m_dualGraph[0]->addTriangle( 2, 11,  5);
+    this->m_dualGraph[0]->addTriangle(11,  9,  5);
+    this->m_dualGraph[0]->addTriangle( 5,  9,  1);
+    this->m_dualGraph[0]->addTriangle( 9,  3,  1);
+    this->m_dualGraph[0]->addTriangle( 1,  3, 10);
+    this->m_dualGraph[0]->addTriangle( 3,  8, 10);
 
     //rim
     //m_dualTriangleList[0]->push_back(CTriangle(Point2, Point1, Point3));
