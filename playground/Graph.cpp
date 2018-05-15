@@ -29,6 +29,7 @@ CGraph::CGraph(size_t size) {
     this->size = size;
     this->G = new std::vector<std::unordered_map<int,int>>(size,std::unordered_map<int,int>(6));
     //this->G = std::vector<std::unordered_map<int,int>>();
+    this->G3D = new std::vector<SPoint3D>(size);
     this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
     this->edgeCounter = 1;
@@ -65,7 +66,7 @@ bool CGraph::addEdge(int u, int v, int w) {
 
 
 void CGraph::addTriangle(int point1, int point2, int point3) {
-
+    //todo split pair<ID,SP3D> into id -> add edge and add SP3D to vertexSP3D table
     addEdge(point1, point2,1);
 
     addEdge(point2, point3,1);

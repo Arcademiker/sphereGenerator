@@ -7,12 +7,20 @@
 #include <vector>
 #include <iostream>
 #include <unordered_map>
+#include <glm/glm.hpp>
 
 class CGraph {
 private:
+    struct SPoint3D
+    {
+        glm::vec3 fPos = glm::vec3(0.0f, 0.0f, 0.0f); //same as normals
+        glm::vec2 fUV = glm::vec2(0.0f,0.0f);
+        glm::vec3 fT = glm::vec3(0.0f,0.0f,0.0f);
+    };
     std::vector<std::unordered_map<int,int>>* G;
+    std::vector<SPoint3D>* G3D;
     //std::pair<std::unordered_map<int,int>::iterator, bool> itAdjcent;
-    std::vector<std::vector<int>>* m_matPointsofTraingle;
+    std::vector<std::vector<int>>* m_matPointsofTraingle; //todo rename
     std::unordered_map<int,int>* m_edgeList;
     size_t size;
     int edgeCounter;

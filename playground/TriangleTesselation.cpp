@@ -52,6 +52,10 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 			CTriangle::SPoint3D Point2 = *m_dualTriangleList[m_nMeshSwitcher]->at(nIterator).GetPoint2();
 			CTriangle::SPoint3D Point3 = *m_dualTriangleList[m_nMeshSwitcher]->at(nIterator).GetPoint3();
 
+            ///std::vector<std::pair<int,CGraph::SPoint3D>> = m_dualGraph[m_nGraphSwitcher]->getPointsofTriangle(nIterator);
+            //todo not necessary: just for the vertex add std::vector<std::pair<int,CGraph::SPoint3D>> datastructure !
+            //todo remove triangle class. do everything with graph resp. vec-triangle extraction? copy all bad. ?
+            //todo point3d getpoint(vertexid) funktion     vertexID -> 6triangle ?
             std::vector<int> vertexTriple = m_dualGraph[m_nGraphSwitcher]->getPointsofTriangle(nIterator);
             //std::cout << vertexTriple[0] << vertexTriple[1] << vertexTriple[2] << std::endl;
 
@@ -89,9 +93,9 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point3,    PointNew2, PointNew1));
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(PointNew1, PointNew2, PointNew3));
 
-            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[0], vertexTripleNew[2], vertexTripleNew[1]);
-            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[1], vertexTripleNew[0], vertexTripleNew[2]);
-            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[2], vertexTripleNew[1], vertexTripleNew[0]);
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[0],    vertexTripleNew[2], vertexTripleNew[1]);
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[1],    vertexTripleNew[0], vertexTripleNew[2]);
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[2],    vertexTripleNew[1], vertexTripleNew[0]);
             m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTripleNew[0], vertexTripleNew[1], vertexTripleNew[2]);
 
             //insert into 1-graphswitcher!
