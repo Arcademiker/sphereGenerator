@@ -8,6 +8,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <glm/glm.hpp>
+#include "Triangle.h"
 
 class CGraph {
 private:
@@ -20,7 +21,7 @@ private:
     };
      */
     std::vector<std::unordered_map<int,int>>* G;
-    //std::vector<SPoint3D>* G3D;
+
     //std::pair<std::unordered_map<int,int>::iterator, bool> itAdjcent;
     std::vector<std::vector<int>>* m_matPointsofTraingle; //todo rename
     std::unordered_map<int,int>* m_edgeList;
@@ -31,6 +32,7 @@ private:
 public:
     CGraph(size_t size);
     ~CGraph();
+    std::vector<CTriangle::SPoint3D*>* G3D; //todo addEdge and datastructure changes
     bool addEdge(int u, int v, int w);
     int getVerticesOfEdge(int e);
     std::unordered_map<int,int> getAdjacent(int u);

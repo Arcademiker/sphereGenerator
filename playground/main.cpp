@@ -217,11 +217,21 @@ int main( )
     //TriangleTesselation.Tesselate(1);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
-    std::cout << "shown faces: " << triangles->size();
+    std::cout << "shown faces: " << triangles->size() << std::endl;
 
     ///test Graph
 
     TriangleTesselation.GetGraph()->printGraph();
+    for(int i = 0; i<TriangleTesselation.GetGraph()->getSize(); i++) {
+        std::cout << TriangleTesselation.GetGraph()->G3D->at(i)->fPos.x << " "
+                  << TriangleTesselation.GetGraph()->G3D->at(i)->fPos.y << " "
+                  << TriangleTesselation.GetGraph()->G3D->at(i)->fPos.z << std::endl;
+    }
+	std::cout << std::endl;
+	for(int i = 0; i<TriangleTesselation.GetGraph()->getSize(); i++) {
+		std::cout << TriangleTesselation.GetGraph()->G3D->at(i)->fUV.x << " "
+				  << TriangleTesselation.GetGraph()->G3D->at(i)->fUV.y << std::endl;
+	}
     /*
 	for(int i=1; i<=30; i++)
 	{

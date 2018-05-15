@@ -11,6 +11,8 @@ CTriangleTesselation::CTriangleTesselation(float fRadius, uint32_t nIterations)
 	m_dualTriangleList[0] = new std::vector<CTriangle>();
 	m_dualTriangleList[1] = new std::vector<CTriangle>();
 
+
+
     this->m_dualGraph[0] = new CGraph(this->m_nNVertices);
     //this->m_nNVertices = this->m_nNVertices*4-6;
     this->m_dualGraph[1] = new CGraph(this->m_nNVertices);
@@ -54,7 +56,7 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 
             ///std::vector<std::pair<int,CGraph::SPoint3D>> = m_dualGraph[m_nGraphSwitcher]->getPointsofTriangle(nIterator);
             ///std::vector<SPoint3D> vertexTriple = m_dualGraph[m_nGraphSwitcher]->getPointsofTriangle(nIterator);
-            ///vertexTriple[0].point1.ID
+            ///vertexTriple[0].point1.ID    vID->point with unorderedmultimap?
             //todo not necessary: just for the vertex add std::vector<std::pair<int,CGraph::SPoint3D>> datastructure !
             //todo remove triangle class. do everything with graph resp. vec-triangle extraction? copy all bad. ?
             //todo point3d getpoint(vertexid) funktion     vertexID -> 6triangle ?
@@ -89,18 +91,28 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
                 //}
             }
             //std::cout << " in " << nIterator << std::endl;
+            //std::cout << m_dualTriangleList[1 - m_nMeshSwitcher]->at(m_dualGraph[1 - m_nGraphSwitcher]->getNTriangles()-1).GetPoint1()->fPos.x << " ";
+            //todo find more safer and elegant solution
 
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point1,    PointNew3, PointNew2));
-			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point2,    PointNew1, PointNew3));
-			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point3,    PointNew2, PointNew1));
-			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(PointNew1, PointNew2, PointNew3));
-
             m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[0],    vertexTripleNew[2], vertexTripleNew[1]);
-            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[1],    vertexTripleNew[0], vertexTripleNew[2]);
-            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[2],    vertexTripleNew[1], vertexTripleNew[0]);
-            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTripleNew[0], vertexTripleNew[1], vertexTripleNew[2]);
+            m_dualGraph[1 - m_nGraphSwitcher]->G3D->at(vertexTriple[0]) = m_dualTriangleList[1 - m_nMeshSwitcher]->at(m_dualGraph[1 - m_nGraphSwitcher]->getNTriangles()-1).GetPoint1();
 
-            //insert into 1-graphswitcher!
+            m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point2,    PointNew1, PointNew3));
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[1],    vertexTripleNew[0], vertexTripleNew[2]);
+            m_dualGraph[1 - m_nGraphSwitcher]->G3D->at(vertexTriple[1]) = m_dualTriangleList[1 - m_nMeshSwitcher]->at(m_dualGraph[1 - m_nGraphSwitcher]->getNTriangles()-1).GetPoint1();
+
+            m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point3,    PointNew2, PointNew1));
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[2],    vertexTripleNew[1], vertexTripleNew[0]);
+            m_dualGraph[1 - m_nGraphSwitcher]->G3D->at(vertexTriple[2]) = m_dualTriangleList[1 - m_nMeshSwitcher]->at(m_dualGraph[1 - m_nGraphSwitcher]->getNTriangles()-1).GetPoint1();
+
+            m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(PointNew1, PointNew2, PointNew3));
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTripleNew[0], vertexTripleNew[1], vertexTripleNew[2]);
+            m_dualGraph[1 - m_nGraphSwitcher]->G3D->at(vertexTripleNew[0]) = m_dualTriangleList[1 - m_nMeshSwitcher]->at(m_dualGraph[1 - m_nGraphSwitcher]->getNTriangles()-1).GetPoint1();
+            m_dualGraph[1 - m_nGraphSwitcher]->G3D->at(vertexTripleNew[1]) = m_dualTriangleList[1 - m_nMeshSwitcher]->at(m_dualGraph[1 - m_nGraphSwitcher]->getNTriangles()-1).GetPoint2();
+            m_dualGraph[1 - m_nGraphSwitcher]->G3D->at(vertexTripleNew[2]) = m_dualTriangleList[1 - m_nMeshSwitcher]->at(m_dualGraph[1 - m_nGraphSwitcher]->getNTriangles()-1).GetPoint3();
+
+
 		}
         oldGraphSize = static_cast<int>(m_dualGraph[1- m_nGraphSwitcher]->getSize());
         //std::cout << "!" << i << " " << m_dualTriangleList[m_nMeshSwitcher]->size() << ", " << m_dualGraph[m_nGraphSwitcher]->getSize() << ", " << m_dualGraph[m_nGraphSwitcher]->getNTriangles() << std::endl;
@@ -108,6 +120,7 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
         m_nGraphSwitcher = 1 - m_nGraphSwitcher;
         //std::cout << "!" << i << " " << m_dualTriangleList[m_nMeshSwitcher]->size() << ", " << m_dualGraph[m_nGraphSwitcher]->getSize() << ", " << m_dualGraph[m_nGraphSwitcher]->getNTriangles() << std::endl;
 	}
+    //todo delte smaller triangle
 	ComputeTextureCoordinates();
     ComputeTangentBitangent();
 }
@@ -377,6 +390,7 @@ void CTriangleTesselation::GenerateTetraeder()
     PointC.fPos = glm::normalize(PointC.fPos);
     PointC.fPos = PointC.fPos * m_fRadius;
 
+
     //northpol
     m_dualTriangleList[0]->push_back(CTriangle(Point7, Point5, Point1));
     m_dualTriangleList[0]->push_back(CTriangle(Point7, Point2, Point5));
@@ -400,7 +414,6 @@ void CTriangleTesselation::GenerateTetraeder()
     m_dualTriangleList[0]->push_back(CTriangle(Point9, Point3, Point1));
     m_dualTriangleList[0]->push_back(CTriangle(Point1, Point3, PointA));
     m_dualTriangleList[0]->push_back(CTriangle(Point3, Point8, PointA));
-
 
     //create logical triangle for graph traversal A=10, B=11, C=0
     //northpol

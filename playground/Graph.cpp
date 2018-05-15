@@ -28,8 +28,8 @@
 CGraph::CGraph(size_t size) {
     this->size = size;
     this->G = new std::vector<std::unordered_map<int,int>>(size,std::unordered_map<int,int>(6));
+    this->G3D = new std::vector<CTriangle::SPoint3D*>(size);
     //this->G = std::vector<std::unordered_map<int,int>>();
-    //this->G3D = new std::vector<SPoint3D>(size);
     this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
     this->edgeCounter = 1;
@@ -38,6 +38,7 @@ CGraph::CGraph(size_t size) {
 
 CGraph::~CGraph() {
     delete this->G;
+    delete this->G3D;
     delete this->m_matPointsofTraingle;
     delete this->m_edgeList;
 }
@@ -72,7 +73,7 @@ void CGraph::addTriangle(int point1, int point2, int point3) {
     addEdge(point2, point3,1);
 
     addEdge(point3, point1,1);
-    std::vector<int> triangle {point1,point2,point3};
+    std::vector<int> triangle {point1,point2,point3}; //tood 3dpoints
     this->m_matPointsofTraingle->push_back(triangle);
     this->triangleCounter++;
 }
@@ -81,7 +82,9 @@ void CGraph::reconstructGraph(size_t size) {
     delete this->G;
     delete this->m_matPointsofTraingle;
     delete this->m_edgeList;
+    delete this->G3D;
     this->G = new std::vector<std::unordered_map<int,int>>(size,std::unordered_map<int,int>(6));
+    this->G3D = new std::vector<CTriangle::SPoint3D*>(size);
     this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
     this->edgeCounter = 1;
@@ -99,6 +102,7 @@ void CGraph::printGraph() {
     }
 }
 
+//todo get trianglelist without ids
 std::vector<int> CGraph::getPointsofTriangle(int triangleID) {
     //todo this performs a deep copy for the case this datastructure gets more complex
     std::vector<int> triangle((*m_matPointsofTraingle)[triangleID]);
@@ -108,6 +112,7 @@ std::vector<int> CGraph::getPointsofTriangle(int triangleID) {
 size_t CGraph::getSize() {
     return this->size;
 }
+
 
 int CGraph::getVerticesOfEdge(int e) {
     //todo return edge pointing on vertex withing specific triangle
