@@ -29,7 +29,7 @@ CGraph::CGraph(size_t size) {
     this->size = size;
     this->G = new std::vector<std::unordered_map<int,int>>(size,std::unordered_map<int,int>(6));
     //this->G = std::vector<std::unordered_map<int,int>>();
-    this->G3D = new std::vector<SPoint3D>(size);
+    //this->G3D = new std::vector<SPoint3D>(size);
     this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
     this->edgeCounter = 1;

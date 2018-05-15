@@ -11,6 +11,7 @@ CAStar::CAStar(CGraph *graph) {
 }
 
 int CAStar::FindPath(glm::vec3 fPosStart, glm::vec3 fPosTarget, const int nOutBufferSize) {
+    /*
     //exist a path variable
     bool bPath = false;
 
@@ -134,6 +135,7 @@ int CAStar::FindPath(glm::vec3 fPosStart, glm::vec3 fPosTarget, const int nOutBu
     }
 
     return nPathLength;
+     */
 }
 
 

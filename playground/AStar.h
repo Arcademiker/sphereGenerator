@@ -19,10 +19,10 @@ private:
 
 public:
     CAStar(CGraph* graph);
-    ~CAStar();
+    //~CAStar();
 
     int FindPath(glm::vec3 fPosStart, glm::vec3 fPosTarget, const int nOutBufferSize);
-    float HScore();
+    //float HScore();
 };
 
 

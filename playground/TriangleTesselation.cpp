@@ -53,6 +53,8 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 			CTriangle::SPoint3D Point3 = *m_dualTriangleList[m_nMeshSwitcher]->at(nIterator).GetPoint3();
 
             ///std::vector<std::pair<int,CGraph::SPoint3D>> = m_dualGraph[m_nGraphSwitcher]->getPointsofTriangle(nIterator);
+            ///std::vector<SPoint3D> vertexTriple = m_dualGraph[m_nGraphSwitcher]->getPointsofTriangle(nIterator);
+            ///vertexTriple[0].point1.ID
             //todo not necessary: just for the vertex add std::vector<std::pair<int,CGraph::SPoint3D>> datastructure !
             //todo remove triangle class. do everything with graph resp. vec-triangle extraction? copy all bad. ?
             //todo point3d getpoint(vertexid) funktion     vertexID -> 6triangle ?
