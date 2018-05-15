@@ -10,6 +10,17 @@
  * order doesnt matter
  * 3D heuristik
  * DOD vs OOD
+ *
+ * elimante all unused data structures (if not useable for colorpicking)
+ * eliminate - edges
+ * one direction circleing without if statements
+ * struct solution!
+ * /-Y-/ plot above tesselation
+ * renaming of nIterator m_...
+ *
+ * edge weightlist or refill the edge id or if edge complexer than just weights floats its ok
+ * edges need xyz
+ * replace old datastructure?
 
  */
 

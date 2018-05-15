@@ -54,7 +54,7 @@ add_executable(playground
     common/shader.cpp
     common/shader.hpp
     common/controls.cpp
-    common/controls.hpp playground/Graph.cpp playground/Graph.h)
+    common/controls.hpp playground/Graph.cpp playground/Graph.h playground/AStar.cpp playground/AStar.h playground/ExplorationAgenda.cpp playground/ExplorationAgenda.h)
 
 #libSOIL.a for loading textures
 target_link_libraries(playground

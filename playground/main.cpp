@@ -213,20 +213,21 @@ int main( )
 
 
     /// generate sphere object:
-    CTriangleTesselation TriangleTesselation(0.5f,3);
+    CTriangleTesselation TriangleTesselation(0.5f,1);
     //TriangleTesselation.Tesselate(1);
     const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size();
 
     ///test Graph
+    /*
     TriangleTesselation.GetGraph()->printGraph();
 	for(int i=1; i<=30; i++)
 	{
 		//std::cout << TriangleTesselation.GetGraph()->getVerticesOfEdge(i)
         // << "\t--\t" << TriangleTesselation.GetGraph()->getVerticesOfEdge(-i) << std::endl;
 	}
-    /*
+
     for(int i=0; i<triangles->size();i++) {
         std::cout << TriangleTesselation.GetGraph()->getPointsofTriangle(i).at(0) << ","
                   << TriangleTesselation.GetGraph()->getPointsofTriangle(i).at(1) << ","

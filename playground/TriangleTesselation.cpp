@@ -72,16 +72,17 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
             for(int t = 0; t<3; t++) {
                 //does vertex already exist
                 //new vertex ID
+                ///just edge to target necessary for this
                 tmpEdgeID = std::abs(m_dualGraph[m_nGraphSwitcher]->getAdjacent( vertexTriple[ (t+1)%3 ] )[ vertexTriple[ (t+2)%3 ] ]);
                 //if(m_dualGraph[1 - m_nGraphSwitcher][tmpVertexID]) { //just push in and connect it will be save
                 vertexTripleNew[t] = oldGraphSize + tmpEdgeID;
-                std::cout << vertexTripleNew[t] << " ";
+                //std::cout << vertexTripleNew[t] << " ";
                 //}
                 //else {
                     //m_dualGraph[1-m_nGraphSwitcher]
                 //}
             }
-            std::cout << " in " << nIterator << std::endl;
+            //std::cout << " in " << nIterator << std::endl;
 
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point1,    PointNew3, PointNew2));
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point2,    PointNew1, PointNew3));
@@ -96,10 +97,10 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
             //insert into 1-graphswitcher!
 		}
         oldGraphSize = static_cast<int>(m_dualGraph[1- m_nGraphSwitcher]->getSize());
-        std::cout << "!" << i << " " << m_dualTriangleList[m_nMeshSwitcher]->size() << ", " << m_dualGraph[m_nGraphSwitcher]->getSize() << ", " << m_dualGraph[m_nGraphSwitcher]->getNTriangles() << std::endl;
+        //std::cout << "!" << i << " " << m_dualTriangleList[m_nMeshSwitcher]->size() << ", " << m_dualGraph[m_nGraphSwitcher]->getSize() << ", " << m_dualGraph[m_nGraphSwitcher]->getNTriangles() << std::endl;
 		m_nMeshSwitcher = 1 - m_nMeshSwitcher;
         m_nGraphSwitcher = 1 - m_nGraphSwitcher;
-        std::cout << "!" << i << " " << m_dualTriangleList[m_nMeshSwitcher]->size() << ", " << m_dualGraph[m_nGraphSwitcher]->getSize() << ", " << m_dualGraph[m_nGraphSwitcher]->getNTriangles() << std::endl;
+        //std::cout << "!" << i << " " << m_dualTriangleList[m_nMeshSwitcher]->size() << ", " << m_dualGraph[m_nGraphSwitcher]->getSize() << ", " << m_dualGraph[m_nGraphSwitcher]->getNTriangles() << std::endl;
 	}
 	ComputeTextureCoordinates();
     ComputeTangentBitangent();
