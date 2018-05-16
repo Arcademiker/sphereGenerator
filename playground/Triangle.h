@@ -21,7 +21,7 @@ public:
 	SPoint3D* GetPoint1();
 	SPoint3D* GetPoint2();
 	SPoint3D* GetPoint3();
-    SPoint3D* GetPoints(int n);
+    const SPoint3D* GetPoints(int n) const;
 
 	//void SetPoint1(SPoint3D Point);
 	//void SetPoint2(SPoint3D Point);

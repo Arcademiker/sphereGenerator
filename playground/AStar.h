@@ -5,20 +5,27 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 #include "Graph.h"
+#include "Triangle.h"
 #include "ExplorationAgenda.h"
 
 
 class CAStar {
 private:
-    glm::vec3 fPos; //todo struct with 3dpoints and pointID
-    glm::vec3 fPosTarget; //todo vielleicht nicht notwendig
+    //glm::vec3 fPos; //todo struct with 3dpoints and pointID
+    //glm::vec3 fPosTarget; //todo vielleicht nicht notwendig
+
     CGraph* graph;
+    const std::vector<CTriangle>* p3DMesh;
     std::vector<int> pOutBuffer;
 
+    const CTriangle::SPoint3D* get3DPoint(int vertexID) const;
+    float HScore(glm::vec3 fPos, glm::vec3 fPosTarget);
+
 public:
-    CAStar(CGraph* graph);
+    CAStar(CGraph* graph,const std::vector<CTriangle>* p3DMesh);
     //~CAStar();
 
     int FindPath(glm::vec3 fPosStart, glm::vec3 fPosTarget, const int nOutBufferSize);

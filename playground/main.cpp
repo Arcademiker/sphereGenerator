@@ -213,18 +213,18 @@ int main( )
 
 
     /// generate sphere object:
-    CTriangleTesselation TriangleTesselation(0.5f,2);
-    //TriangleTesselation.Tesselate(1);
-    const std::vector<CTriangle>* triangles = TriangleTesselation.GetTriangleList();
+    CTriangleTesselation triangleTesselation(0.5f,2);
+    //triangleTesselation.Tesselate(1);
+    const std::vector<CTriangle>* triangles = triangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size() << std::endl;
 
     ///test Graph
 
-    //TriangleTesselation.GetGraph()->printGraph();
-    /*
-    for(int i = 0; i<TriangleTesselation.GetGraph()->getSize(); i++) {
-        std::cout << TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i).first << "->" << TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i).second << " ";
+    //triangleTesselation.GetGraph()->printGraph();
+
+    for(int i = 0; i<triangleTesselation.GetGraph()->getSize(); i++) {
+        std::cout << triangleTesselation.GetGraph()->get3DPointIDofVertexID(i).first << "->" << triangleTesselation.GetGraph()->get3DPointIDofVertexID(i).second << " ";
         if(i%3==2) {
             std::cout << std::endl;
         }
@@ -233,8 +233,8 @@ int main( )
 
     std::cout << "test: " << std::endl;
 
-    for(int i = 0; i<TriangleTesselation.GetGraph()->getSize(); i++) {
-        std::cout << " " <<TriangleTesselation.GetGraph()->getPointsofTriangle(TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i).first).at(TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i).second);
+    for(int i = 0; i<triangleTesselation.GetGraph()->getSize(); i++) {
+        std::cout << " " <<triangleTesselation.GetGraph()->getPointsofTriangle(triangleTesselation.GetGraph()->get3DPointIDofVertexID(i).first).at(triangleTesselation.GetGraph()->get3DPointIDofVertexID(i).second);
         if(i%3==2) {
             std::cout << std::endl;
         }
@@ -242,26 +242,26 @@ int main( )
 
     std::cout << "3d points: " << std::endl;
 
-    for(int i = 0; i<TriangleTesselation.GetGraph()->getSize(); i++) {
-        std::cout << "(" <<TriangleTesselation.GetPointofTriangleList(TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i))->fPos.x << ","
-                << TriangleTesselation.GetPointofTriangleList(TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i))->fPos.y << ","
-                << TriangleTesselation.GetPointofTriangleList(TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i))->fPos.z << ") ";
+    for(int i = 0; i<triangleTesselation.GetGraph()->getSize(); i++) {
+        std::cout << "(" <<triangleTesselation.GetPointofTriangleList(triangleTesselation.GetGraph()->get3DPointIDofVertexID(i))->fPos.x << ","
+                << triangleTesselation.GetPointofTriangleList(triangleTesselation.GetGraph()->get3DPointIDofVertexID(i))->fPos.y << ","
+                << triangleTesselation.GetPointofTriangleList(triangleTesselation.GetGraph()->get3DPointIDofVertexID(i))->fPos.z << ") ";
         if(i%3==2) {
             std::cout << std::endl;
         }
     }
-    */
+
     /*
 	for(int i=1; i<=30; i++)
 	{
-		//std::cout << TriangleTesselation.GetGraph()->getVerticesOfEdge(i)
-        // << "\t--\t" << TriangleTesselation.GetGraph()->getVerticesOfEdge(-i) << std::endl;
+		//std::cout << triangleTesselation.GetGraph()->getVerticesOfEdge(i)
+        // << "\t--\t" << triangleTesselation.GetGraph()->getVerticesOfEdge(-i) << std::endl;
 	}
 
     for(int i=0; i<triangles->size();i++) {
-        std::cout << TriangleTesselation.GetGraph()->getPointsofTriangle(i).at(0) << ","
-                  << TriangleTesselation.GetGraph()->getPointsofTriangle(i).at(1) << ","
-                  << TriangleTesselation.GetGraph()->getPointsofTriangle(i).at(2)
+        std::cout << triangleTesselation.GetGraph()->getPointsofTriangle(i).at(0) << ","
+                  << triangleTesselation.GetGraph()->getPointsofTriangle(i).at(1) << ","
+                  << triangleTesselation.GetGraph()->getPointsofTriangle(i).at(2)
                   << std::endl;
     }
     */
@@ -301,7 +301,7 @@ int main( )
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	//glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
 
-    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 
     glm::mat4 ModelMatrix = glm::mat4();

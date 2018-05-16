@@ -4,10 +4,9 @@
 
 #include "AStar.h"
 
-CAStar::CAStar(CGraph *graph) {
+CAStar::CAStar(CGraph *graph,const std::vector<CTriangle>* p3DMesh) {
     this->graph = graph;
-    this->fPos =  glm::vec3(0.0f, 0.0f, 0.0f);
-    this->fPosTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    this->p3DMesh = p3DMesh;
 }
 
 int CAStar::FindPath(glm::vec3 fPosStart, glm::vec3 fPosTarget, const int nOutBufferSize) {
@@ -137,6 +136,21 @@ int CAStar::FindPath(glm::vec3 fPosStart, glm::vec3 fPosTarget, const int nOutBu
     return nPathLength;
      */
 }
+
+const CTriangle::SPoint3D* CAStar::get3DPoint(int vertexID) const {
+    //todo TPID explain
+    std::pair<int,int> TPID = this->graph->get3DPointIDofVertexID(vertexID);
+    return this->p3DMesh->at(TPID.first).GetPoints(TPID.second);
+}
+
+//todo: quadrat of hscore ok?
+float CAStar::HScore(glm::vec3 fPos, glm::vec3 fPosTarget) {
+    return (fPos.x-fPosTarget.x)*(fPos.x-fPosTarget.x)
+           +(fPos.y-fPosTarget.y)*(fPos.y-fPosTarget.y)
+           +(fPos.z-fPosTarget.z)*(fPos.z-fPosTarget.z);
+}
+
+
 
 
 

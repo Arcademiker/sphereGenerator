@@ -7,7 +7,6 @@
 #include <vector>
 #include <iostream>
 #include <unordered_map>
-#include <glm/glm.hpp>
 #include "Triangle.h"
 
 class CGraph {

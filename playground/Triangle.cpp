@@ -41,7 +41,7 @@ CTriangle::SPoint3D* CTriangle::GetPoint3()
 	return &m_Points[2];
 }
 
-CTriangle::SPoint3D *CTriangle::GetPoints(int n) {
+const CTriangle::SPoint3D *CTriangle::GetPoints(int n) const {
     return &m_Points[n];
 }
 
