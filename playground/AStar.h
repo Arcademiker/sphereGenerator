@@ -19,17 +19,19 @@ private:
 
     CGraph* graph;
     const std::vector<CTriangle>* p3DMesh;
-    std::vector<int> pOutBuffer;
+    std::vector<int>* pOutBuffer;
 
     const CTriangle::SPoint3D* get3DPoint(int vertexID) const;
     float HScore(glm::vec3 fPos, glm::vec3 fPosTarget);
 
 public:
     CAStar(CGraph* graph,const std::vector<CTriangle>* p3DMesh);
-    //~CAStar();
+    ~CAStar();
 
-    int FindPath(glm::vec3 fPosStart, glm::vec3 fPosTarget, const int nOutBufferSize);
-    //float HScore();
+    int FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int nOutBufferSize);
+
+    //get route in vertexIDs
+    std::vector<int>* getRoute();
 };
 
 

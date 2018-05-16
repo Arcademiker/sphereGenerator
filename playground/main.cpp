@@ -44,6 +44,7 @@ GLFWwindow* window;
 #include "SOIL.h"
 #include "Camera.h"
 #include "Graph.h"
+#include "AStar.h"
 
 void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texIndex);
 void updateVPMatFromInput(CCamera* pCamera, float speed);
@@ -213,7 +214,7 @@ int main( )
 
 
     /// generate sphere object:
-    CTriangleTesselation triangleTesselation(0.5f,2);
+    CTriangleTesselation triangleTesselation(0.5f,1);
     //triangleTesselation.Tesselate(1);
     const std::vector<CTriangle>* triangles = triangleTesselation.GetTriangleList();
 
@@ -221,8 +222,19 @@ int main( )
 
     ///test Graph
 
-    //triangleTesselation.GetGraph()->printGraph();
+    triangleTesselation.GetGraph()->printGraph();
 
+    ///test AStar
+
+    CAStar astar(triangleTesselation.GetGraph(),triangles);
+    astar.FindPath(7,13,20);
+    std::vector<int> route = *astar.getRoute();
+
+    for(auto v : route) {
+        std::cout << v << " ";
+    }
+
+    /*
     for(int i = 0; i<triangleTesselation.GetGraph()->getSize(); i++) {
         std::cout << triangleTesselation.GetGraph()->get3DPointIDofVertexID(i).first << "->" << triangleTesselation.GetGraph()->get3DPointIDofVertexID(i).second << " ";
         if(i%3==2) {
@@ -232,6 +244,7 @@ int main( )
 
 
     std::cout << "test: " << std::endl;
+
 
     for(int i = 0; i<triangleTesselation.GetGraph()->getSize(); i++) {
         std::cout << " " <<triangleTesselation.GetGraph()->getPointsofTriangle(triangleTesselation.GetGraph()->get3DPointIDofVertexID(i).first).at(triangleTesselation.GetGraph()->get3DPointIDofVertexID(i).second);
@@ -250,6 +263,7 @@ int main( )
             std::cout << std::endl;
         }
     }
+     */
 
     /*
 	for(int i=1; i<=30; i++)

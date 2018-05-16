@@ -13,9 +13,9 @@ ExplorationAgenda::~ExplorationAgenda() {
     delete qPriorityQ;
 }
 
-void ExplorationAgenda::Add(int nK, int nV) {
+void ExplorationAgenda::Add(float nK, int nV) {
 
-    this->qPriorityQ->push(std::pair<int,int>(nK,nV));
+    this->qPriorityQ->push(std::pair<float,int>(nK,nV));
 }
 
 // attention! for efficiency purposes it is not tested in VisitTop() whether the queue is empty before pop()
