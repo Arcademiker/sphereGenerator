@@ -83,13 +83,14 @@ void CGraph::reconstructGraph(size_t size) {
     delete this->m_matPointsofTraingle;
     delete this->m_edgeList;
     delete this->G3D;
+    this->size = size;
     this->G = new std::vector<std::unordered_map<int,int>>(size,std::unordered_map<int,int>(6));
     this->G3D = new std::vector<CTriangle::SPoint3D*>(size);
     this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
-    this->edgeCounter = 1;
     this->edgeCounter = 0;
-    this->size = size;
+    //this->edgeCounter = 0; //todo????
+    this->triangleCounter = 0;
 }
 
 void CGraph::printGraph() {
