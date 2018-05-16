@@ -28,7 +28,8 @@
 CGraph::CGraph(size_t size) {
     this->size = size;
     this->G = new std::vector<std::unordered_map<int,int>>(size,std::unordered_map<int,int>(6));
-    this->G3D = new std::vector<CTriangle::SPoint3D*>(size);
+    //this->G3D = new std::vector<CTriangle::SPoint3D*>(size);
+    this->G3DTable = new std::vector<std::pair<int,int>>(size);
     //this->G = std::vector<std::unordered_map<int,int>>();
     this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
@@ -38,7 +39,8 @@ CGraph::CGraph(size_t size) {
 
 CGraph::~CGraph() {
     delete this->G;
-    delete this->G3D;
+    //delete this->G3D;
+    delete this->G3DTable;
     delete this->m_matPointsofTraingle;
     delete this->m_edgeList;
 }
@@ -66,6 +68,7 @@ bool CGraph::addEdge(int u, int v, int w) {
 }
 
 
+
 void CGraph::addTriangle(int point1, int point2, int point3) {
     //todo split pair<ID,SP3D> into id -> add edge and add SP3D to vertexSP3D table
     addEdge(point1, point2,1);
@@ -75,17 +78,28 @@ void CGraph::addTriangle(int point1, int point2, int point3) {
     addEdge(point3, point1,1);
     std::vector<int> triangle {point1,point2,point3}; //tood 3dpoints
     this->m_matPointsofTraingle->push_back(triangle);
+
+    this->G3DTable->at(point1) = std::make_pair(this->triangleCounter,0);
+    this->G3DTable->at(point2) = std::make_pair(this->triangleCounter,1);
+    this->G3DTable->at(point3) = std::make_pair(this->triangleCounter,2);
+
     this->triangleCounter++;
+}
+
+std::pair<int,int> CGraph::get3DPointIDofVertexID(int VertexID) {
+    return this->G3DTable->at(VertexID);
 }
 
 void CGraph::reconstructGraph(size_t size) {
     delete this->G;
     delete this->m_matPointsofTraingle;
     delete this->m_edgeList;
-    delete this->G3D;
+    delete this->G3DTable;
+    //delete this->G3D;
     this->size = size;
     this->G = new std::vector<std::unordered_map<int,int>>(size,std::unordered_map<int,int>(6));
-    this->G3D = new std::vector<CTriangle::SPoint3D*>(size);
+    this->G3DTable = new std::vector<std::pair<int,int>>(size);
+    //this->G3D = new std::vector<CTriangle::SPoint3D*>(size);
     this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
     this->edgeCounter = 0;
@@ -127,6 +141,8 @@ std::unordered_map<int,int> CGraph::getAdjacent(int u) {
 int CGraph::getNTriangles() {
     return this->triangleCounter;
 }
+
+
 
 
 

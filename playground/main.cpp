@@ -39,7 +39,7 @@ GLFWwindow* window;
 //#include <assimp/postprocess.h>
 
 #include <iostream>
-//#include <GL/glxew.h> //for vsync
+#include <GL/glxew.h> //for vsync
 //#include <GL/glx.h>
 #include "SOIL.h"
 #include "Camera.h"
@@ -88,7 +88,7 @@ int main( )
 		return -1;
 	}
 
-    /*
+
     //activating vsync
     Display *dpy = glXGetCurrentDisplay();
     GLXDrawable drawable = glXGetCurrentDrawable();
@@ -96,7 +96,7 @@ int main( )
     if (drawable) {
         glXSwapIntervalEXT(dpy, drawable, interval);
     }
-    */
+
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     // Hide the mouse and enable unlimited mouvement
@@ -221,18 +221,36 @@ int main( )
 
     ///test Graph
 
-    TriangleTesselation.GetGraph()->printGraph();
+    //TriangleTesselation.GetGraph()->printGraph();
+    /*
     for(int i = 0; i<TriangleTesselation.GetGraph()->getSize(); i++) {
-        std::cout << TriangleTesselation.GetGraph()->G3D->at(i)->fPos.x << " "
-                  << TriangleTesselation.GetGraph()->G3D->at(i)->fPos.y << " "
-                  << TriangleTesselation.GetGraph()->G3D->at(i)->fPos.z << std::endl;
+        std::cout << TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i).first << "->" << TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i).second << " ";
+        if(i%3==2) {
+            std::cout << std::endl;
+        }
     }
-	std::cout << std::endl;
-	for(int i = 0; i<TriangleTesselation.GetGraph()->getSize(); i++) {
-		std::cout << TriangleTesselation.GetGraph()->G3D->at(i)->fUV.x << " "
-				  << TriangleTesselation.GetGraph()->G3D->at(i)->fUV.y << std::endl;
-	}
 
+
+    std::cout << "test: " << std::endl;
+
+    for(int i = 0; i<TriangleTesselation.GetGraph()->getSize(); i++) {
+        std::cout << " " <<TriangleTesselation.GetGraph()->getPointsofTriangle(TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i).first).at(TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i).second);
+        if(i%3==2) {
+            std::cout << std::endl;
+        }
+    }
+
+    std::cout << "3d points: " << std::endl;
+
+    for(int i = 0; i<TriangleTesselation.GetGraph()->getSize(); i++) {
+        std::cout << "(" <<TriangleTesselation.GetPointofTriangleList(TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i))->fPos.x << ","
+                << TriangleTesselation.GetPointofTriangleList(TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i))->fPos.y << ","
+                << TriangleTesselation.GetPointofTriangleList(TriangleTesselation.GetGraph()->get3DPointIDofVertexID(i))->fPos.z << ") ";
+        if(i%3==2) {
+            std::cout << std::endl;
+        }
+    }
+    */
     /*
 	for(int i=1; i<=30; i++)
 	{
@@ -283,7 +301,7 @@ int main( )
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	//glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
 
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 
     glm::mat4 ModelMatrix = glm::mat4();
@@ -456,7 +474,8 @@ void loadImage_SOIL(GLuint* textures,const char* imagepath, unsigned int texInde
 
     //glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_CLAMP_TO_EDGE); //correct
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);

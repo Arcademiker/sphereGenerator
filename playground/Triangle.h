@@ -14,21 +14,23 @@ public:
         glm::vec3 fT = glm::vec3(0.0f,0.0f,0.0f);
 	};
 
-	CTriangle();
+	//CTriangle();
 	CTriangle(SPoint3D Point1, SPoint3D Point2, SPoint3D Point3);
 	~CTriangle();
 
 	SPoint3D* GetPoint1();
 	SPoint3D* GetPoint2();
 	SPoint3D* GetPoint3();
+    SPoint3D* GetPoints(int n);
 
-	void SetPoint1(SPoint3D Point);
-	void SetPoint2(SPoint3D Point);
-	void SetPoint3(SPoint3D Point);
+	//void SetPoint1(SPoint3D Point);
+	//void SetPoint2(SPoint3D Point);
+	//void SetPoint3(SPoint3D Point);
 
 private:
-	SPoint3D m_Point1;
-	SPoint3D m_Point2;
-	SPoint3D m_Point3;
+	//SPoint3D m_Point1;
+	//SPoint3D m_Point2;
+	//SPoint3D m_Point3;
+	SPoint3D m_Points[3];
 };
 
