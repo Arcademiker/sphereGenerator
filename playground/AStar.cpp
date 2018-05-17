@@ -8,10 +8,12 @@ CAStar::CAStar(CGraph *graph,const std::vector<CTriangle>* p3DMesh) {
     this->graph = graph;
     this->p3DMesh = p3DMesh;
     this->pOutBuffer = new std::vector<int>;
+    this->pRoute3DPoints = new std::vector<CTriangle::SPoint3D>;
 }
 
 CAStar::~CAStar() {
     delete this->pOutBuffer;
+    delete this->pRoute3DPoints;
 }
 
 
@@ -25,9 +27,8 @@ int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int n
     int nPathLength = 0;
 
     //clear old pOutBuffer from last pathfinding (pOutBuffer stores the vertexIDs of the taken route)
-    delete pOutBuffer;
+    delete this->pOutBuffer;
     this->pOutBuffer = new std::vector<int>(nOutBufferSize,-1);
-
 
     //visit start vertex
     ///const int nMapSize = nMapHeight*nMapWidth;
@@ -83,12 +84,18 @@ int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int n
 
         //abort if target vertex is reached
         if (vertexIDTarget==vertexID) {
-
+            //create list of 3Dpoints for opengl draw routine
+            delete this->pRoute3DPoints;
+            this->pRoute3DPoints = new std::vector<CTriangle::SPoint3D>(nPathLength+1);
             //find the shortest way back from the target to the start
             for(int i=nPathLength; i>0; i--) {
                 (*pOutBuffer)[i-1] = vertexID;
+                (*pRoute3DPoints)[i] = *this->get3DPoint(vertexID);
                 vertexID = (*pParentNode)[vertexID];
             }
+            //insert start Point in 3D Point List
+            //vertexID = (*pParentNode)[vertexID];
+            (*pRoute3DPoints)[0] = *this->get3DPoint(vertexID);
             bPath = true;
             break;
         }
@@ -177,6 +184,10 @@ float CAStar::HScore(glm::vec3 fPos, glm::vec3 fPosTarget) {
 
 std::vector<int>* CAStar::getRoute() {
     return this->pOutBuffer;
+}
+
+const std::vector<CTriangle::SPoint3D> *CAStar::getRoute3DPoints() const{
+    return this->pRoute3DPoints;
 }
 
 

@@ -148,21 +148,25 @@ int main( )
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
 
-	GLuint VertexArrayID;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
+
+    ///glBindVertexArray(VertexArrayID[1]);
 
 	// Create and compile our GLSL program from the shaders
-	GLuint programID = LoadShaders( "../playground/TransformVertexShader.vertexshader", "../playground/TextureFragmentShader.fragmentshader" );
+	GLuint programID1 = LoadShaders( "../playground/TransformVertexShader.vertexshader", "../playground/TextureFragmentShader.fragmentshader" );
+
+    GLuint programID2 = LoadShaders( "../playground/line.vertexshader", "../playground/line.fragmentshader" );
+
 
     // Get a handle for our "P" uniform
-    //GLuint MatrixID0 = glGetUniformLocation(programID, "M");
+    //GLuint MatrixID0 = glGetUniformLocation(programID1, "M");
     // Get a handle for our "MV" uniform
-    GLuint MatrixID1 = glGetUniformLocation(programID, "MV");
+    GLuint MatrixID1 = glGetUniformLocation(programID1, "MV");
 	// Get a handle for our "MVP" uniform
-	GLuint MatrixID2 = glGetUniformLocation(programID, "MVP");
+	GLuint MatrixID2 = glGetUniformLocation(programID1, "MVP");
 
-	GLuint MatrixID3 = glGetUniformLocation(programID, "ViewMatrix");
+    GLuint MatrixID2line = glGetUniformLocation(programID2, "MVP");
+
+	GLuint MatrixID3 = glGetUniformLocation(programID1, "ViewMatrix");
 
 
 
@@ -174,29 +178,32 @@ int main( )
 	//loadImage_SOIL(textures,"../playground/marsheightwater.png",0);
 
 	// Get a handle for our "myTextureSampler" uniform
-	GLuint HeightmapID  = glGetUniformLocation(programID, "myHeightmap");
+	GLuint HeightmapID  = glGetUniformLocation(programID1, "myHeightmap");
+
+    //for line shader
+    GLuint HeightmapIDline  = glGetUniformLocation(programID2, "myHeightmap");
 
     // Load the texture
     //loadImage_SOIL(textures,"../playground/marstexture.jpg",1);
     //loadImage_SOIL(textures,"../playground/earthDiffuse8kice.jpg",1);
     loadImage_SOIL(textures,"../playground/earth16kiceblue.jpg",1);
 	//loadImage_SOIL(textures,"../playground/marstexturemareblue2.jpg",1);
-    GLuint TextureID  = glGetUniformLocation(programID, "myTexture");
+    GLuint TextureID  = glGetUniformLocation(programID1, "myTexture");
 
 
     //load normalmap
     loadImage_SOIL(textures,"../playground/earthNormal8k.png",2);
 	//loadImage_SOIL(textures,"../playground/normalmars4.png",2);
-    GLuint NormalID  = glGetUniformLocation(programID, "myNormal");
+    GLuint NormalID  = glGetUniformLocation(programID1, "myNormal");
 
 	//load specular
 	loadImage_SOIL(textures,"../playground/earthSpecular8kfinal.png",3);
 	//loadImage_SOIL(textures,"../playground/marsspecular.png",3);
-	GLuint SpecularID  = glGetUniformLocation(programID, "mySpecular");
+	GLuint SpecularID  = glGetUniformLocation(programID1, "mySpecular");
 
     //load nighttexture
     loadImage_SOIL(textures,"../playground/earth16cities4.jpg",4);
-    GLuint Texture2ID  = glGetUniformLocation(programID, "myTexture2");
+    GLuint Texture2ID  = glGetUniformLocation(programID1, "myTexture2");
 
 
 
@@ -222,19 +229,20 @@ int main( )
     std::cout << "shown faces: " << triangles->size() << std::endl;
 
     ///test Graph
-    /*
+
     triangleTesselation.GetGraph()->printGraph();
 
     ///test AStar
 
     CAStar astar(triangleTesselation.GetGraph(),triangles);
-    astar.FindPath(7,8,20);
+    astar.FindPath(7,4,20);
     std::vector<int> route = *astar.getRoute();
+    const std::vector<CTriangle::SPoint3D>* points = astar.getRoute3DPoints();
 
     for(auto v : route) {
         std::cout << v << " ";
     }
-    */
+
     /*
     for(int i = 0; i<triangleTesselation.GetGraph()->getSize(); i++) {
         std::cout << triangleTesselation.GetGraph()->get3DPointIDofVertexID(i).first << "->" << triangleTesselation.GetGraph()->get3DPointIDofVertexID(i).second << " ";
@@ -301,22 +309,125 @@ int main( )
 	//std::vector<glm::vec2> uvs;
 	//std::vector<glm::vec3> normals; // Won't be used at the moment.
 	//bool res = loadOBJ("../playground/cube.obj", vertices, uvs, normals);
-    ///bool res = loadOBJ(triangles, vertices, uvs, normals);
+    ////bool res = loadOBJ(triangles, vertices, uvs, normals);
 
 
 	// Load it into a VBO
 
-	GLuint vertexbuffer;
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    GLuint VertexArrayID[2];
+    glGenVertexArrays(2, VertexArrayID);
+    glBindVertexArray(VertexArrayID[0]);
+
+    GLuint vertexbuffer1;
+	glGenBuffers(1, &vertexbuffer1);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer1);
 	glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
+
+    // 1rst attribute buffer : vertices
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer1);
+    glVertexAttribPointer(
+            0,                  // attribute
+            3,                  // size
+            GL_FLOAT,           // type
+            GL_FALSE,           // normalized?
+            sizeof(CTriangle::SPoint3D),    // stride
+            (void*)0            // array buffer offset
+    );
+    int* pAttributPointer;
+    // 2nd attribute buffer : UVs
+    pAttributPointer = reinterpret_cast<int*>(sizeof(float)*3);
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer1);
+    glVertexAttribPointer(
+            1,                                // attribute
+            2,                                // size
+            GL_FLOAT,                         // type
+            GL_FALSE,                         // normalized?
+            sizeof(CTriangle::SPoint3D),                  // stride
+            pAttributPointer                  // array buffer offset
+    );
+    // 3rd attribute buffer : normalen
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer1);
+    glVertexAttribPointer(
+            2,                  // attribute
+            3,                  // size
+            GL_FLOAT,           // type
+            GL_TRUE,           // normalized?
+            sizeof(CTriangle::SPoint3D),    // stride
+            (void*)0            // array buffer offset
+    );
+    // 4th attribute buffer : tangenten
+    pAttributPointer = reinterpret_cast<int*>(sizeof(float)*5);
+    glEnableVertexAttribArray(3);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer1);
+    glVertexAttribPointer(
+            3,                  // attribute
+            3,                  // size
+            GL_FLOAT,           // type
+            GL_TRUE,           // normalized?
+            sizeof(CTriangle::SPoint3D),    // stride
+            pAttributPointer           // array buffer offset
+    );
+
+
+
+    //bind AStar line
+
+    // Use our shader
+    //glUseProgram(programID2);
+
+    glBindVertexArray(VertexArrayID[1]);
+
+    GLuint vertexbuffer2;
+    glGenBuffers(1, &vertexbuffer2);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer2);
+    glBufferData(GL_ARRAY_BUFFER, points->size() * sizeof(CTriangle::SPoint3D), &points->at(0), GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer2);
+    glVertexAttribPointer(
+            0,                  // attribute
+            3,                  // size
+            GL_FLOAT,           // type
+            GL_FALSE,           // normalized?
+            sizeof(CTriangle::SPoint3D),    // stride
+            (void*)0            // array buffer offset
+    );
+
+    int* pAttributPointer2;
+    // 2nd attribute buffer : UVs
+    pAttributPointer2 = reinterpret_cast<int*>(sizeof(float)*3);
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer2);
+    glVertexAttribPointer(
+            1,                                // attribute
+            2,                                // size
+            GL_FLOAT,                         // type
+            GL_FALSE,                         // normalized?
+            sizeof(CTriangle::SPoint3D),                  // stride
+            pAttributPointer2                  // array buffer offset
+    );
+    // 3rd attribute buffer : normalen
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer2);
+    glVertexAttribPointer(
+            2,                  // attribute
+            3,                  // size
+            GL_FLOAT,           // type
+            GL_TRUE,           // normalized?
+            sizeof(CTriangle::SPoint3D),    // stride
+            (void*)0            // array buffer offset
+    );
+
 
 	//GLuint uvbuffer;
 	//glGenBuffers(1, &uvbuffer);
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	//glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
 
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    ///glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 
     glm::mat4 ModelMatrix = glm::mat4();
@@ -324,7 +435,7 @@ int main( )
     glm::mat4 ProjectionMatrix = glm::mat4();
 	//ModelMatrix = glm::rotate( ModelMatrix,3.141592f,glm::vec3(0.0f,0.0f,1.0f));
     ///camera ini
-    int* pAttributPointer;
+
 
 	do{
 
@@ -332,7 +443,7 @@ int main( )
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Use our shader
-		glUseProgram(programID);
+		glUseProgram(programID1);
 
 		// Compute the MVP matrix from keyboard and mouse input
 		computeMatricesFromInputs();
@@ -368,7 +479,7 @@ int main( )
 		glBindTexture(GL_TEXTURE_2D, textures[0]);
 		// Set our "myHeightmap" sampler to use Texture Unit 0
 		glUniform1i(HeightmapID, 0);
-        //glUniform1i( glGetUniformLocation( programID, "myTextureSampler" ), 0 );
+        //glUniform1i( glGetUniformLocation( programID1, "myTextureSampler" ), 0 );
         // Bind our texture in Texture Unit 1
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, textures[1]);
@@ -390,7 +501,7 @@ int main( )
         // Set our "myTexture" sampler to use Texture Unit 0
         glUniform1i(Texture2ID, 4);
 
-
+        /*
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -438,13 +549,37 @@ int main( )
             sizeof(CTriangle::SPoint3D),    // stride
             pAttributPointer           // array buffer offset
 		);
-
-
-		// Draw the triangles !
+        */
 		//glDrawArrays(GL_TRIANGLES, 0, triangles->size() * sizeof(glm::vec3)*3 );  // /* ( 2 * sizeof(glm::vec3) + sizeof(glm::vec2)) */ /* 3 * 10 */ );
-        glDrawArrays(GL_TRIANGLES, 0, triangles->size() * 3*10);
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
+
+        glBindVertexArray(VertexArrayID[0]);
+		// Draw the triangles !
+        glDrawArrays(GL_TRIANGLES, 0, triangles->size() * 3);
+        glBindVertexArray(0);
+
+        // Use our shader
+        glUseProgram(programID2);
+
+        //glUniformMatrix4fv(MatrixID1, 1, GL_FALSE, &MV[0][0]);
+        // in the "MVP" uniform
+        glUniformMatrix4fv(MatrixID2line, 1, GL_FALSE, &MVP[0][0]);
+
+        //glUniformMatrix4fv(MatrixID3, 1, GL_FALSE, &ViewMatrix[0][0]);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textures[0]);
+        // Set our "myHeightmap" sampler to use Texture Unit 0
+        glUniform1i(HeightmapIDline, 0);
+
+        glBindVertexArray(VertexArrayID[1]);
+        // Draw the Line !
+        glDrawArrays(GL_LINE_STRIP, 0, points->size() );
+        glBindVertexArray(0);
+
+		//glDisableVertexAttribArray(0);
+		//glDisableVertexAttribArray(1);
+        //glDisableVertexAttribArray(2);
+        //glDisableVertexAttribArray(3);
 
 		// Swap buffers
 		glfwSwapBuffers(window);
@@ -455,11 +590,13 @@ int main( )
 		   glfwWindowShouldClose(window) == 0 );
 
 	// Cleanup VBO and shader
-	glDeleteBuffers(1, &vertexbuffer);
+	glDeleteBuffers(1, &vertexbuffer1);
+    glDeleteBuffers(1, &vertexbuffer2);
 	//glDeleteBuffers(1, &uvbuffer);
-	glDeleteProgram(programID);
+	glDeleteProgram(programID1);
+    glDeleteProgram(programID2);
 	glDeleteTextures(1, textures);
-	glDeleteVertexArrays(1, &VertexArrayID);
+	glDeleteVertexArrays(2, VertexArrayID);
     //SOIL_free_image_data(TextureID);
 
 	// Close OpenGL window and terminate GLFW

@@ -20,6 +20,7 @@ private:
     CGraph* graph;
     const std::vector<CTriangle>* p3DMesh;
     std::vector<int>* pOutBuffer;
+    std::vector<CTriangle::SPoint3D>* pRoute3DPoints;
 
     const CTriangle::SPoint3D* get3DPoint(int vertexID) const;
     float HScore(glm::vec3 fPos, glm::vec3 fPosTarget);
@@ -32,6 +33,8 @@ public:
 
     //get route in vertexIDs
     std::vector<int>* getRoute();
+
+    const std::vector<CTriangle::SPoint3D>* getRoute3DPoints() const;
 };
 
 
