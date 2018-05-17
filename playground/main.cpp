@@ -98,6 +98,7 @@ int main( )
         glXSwapIntervalEXT(dpy, drawable, interval);
     }
 
+
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     // Hide the mouse and enable unlimited mouvement
@@ -214,26 +215,26 @@ int main( )
 
 
     /// generate sphere object:
-    CTriangleTesselation triangleTesselation(0.5f,1);
+    CTriangleTesselation triangleTesselation(0.5f,3);
     //triangleTesselation.Tesselate(1);
     const std::vector<CTriangle>* triangles = triangleTesselation.GetTriangleList();
 
     std::cout << "shown faces: " << triangles->size() << std::endl;
 
     ///test Graph
-
+    /*
     triangleTesselation.GetGraph()->printGraph();
 
     ///test AStar
 
     CAStar astar(triangleTesselation.GetGraph(),triangles);
-    astar.FindPath(7,13,20);
+    astar.FindPath(7,8,20);
     std::vector<int> route = *astar.getRoute();
 
     for(auto v : route) {
         std::cout << v << " ";
     }
-
+    */
     /*
     for(int i = 0; i<triangleTesselation.GetGraph()->getSize(); i++) {
         std::cout << triangleTesselation.GetGraph()->get3DPointIDofVertexID(i).first << "->" << triangleTesselation.GetGraph()->get3DPointIDofVertexID(i).second << " ";
@@ -323,6 +324,7 @@ int main( )
     glm::mat4 ProjectionMatrix = glm::mat4();
 	//ModelMatrix = glm::rotate( ModelMatrix,3.141592f,glm::vec3(0.0f,0.0f,1.0f));
     ///camera ini
+    int* pAttributPointer;
 
 	do{
 
@@ -344,7 +346,7 @@ int main( )
         //mat4 rotation;
         //rotation = glm::rotate(2.0f, vec3(0,1,0));
 
-        ///ModelMatrix = glm::rotate( ModelMatrix,0.001f,glm::vec3(0.0f,1.0f,0.0f));
+        ModelMatrix = glm::rotate( ModelMatrix,0.001f,glm::vec3(0.0f,1.0f,0.0f));
 
         //glm::rotate(0.1f,glm::vec3(0,1,0));
         glm::mat4 MV =  ViewMatrix * ModelMatrix;
@@ -402,7 +404,7 @@ int main( )
 		);
 
 		// 2nd attribute buffer : UVs
-        int* pAttributPointer = reinterpret_cast<int*>(sizeof(float)*3);
+        pAttributPointer = reinterpret_cast<int*>(sizeof(float)*3);
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glVertexAttribPointer(
@@ -438,9 +440,9 @@ int main( )
 		);
 
 
-		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, triangles->size()* 3 * 10 );
-
+		// Draw the triangles !
+		//glDrawArrays(GL_TRIANGLES, 0, triangles->size() * sizeof(glm::vec3)*3 );  // /* ( 2 * sizeof(glm::vec3) + sizeof(glm::vec2)) */ /* 3 * 10 */ );
+        glDrawArrays(GL_TRIANGLES, 0, triangles->size() * 3*10);
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 

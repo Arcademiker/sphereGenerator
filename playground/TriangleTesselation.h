@@ -14,7 +14,7 @@ public:
 
 	void Tesselate(uint32_t nIterations = 5);
 	const std::vector<CTriangle>* GetTriangleList() const;
-	const CTriangle::SPoint3D* GetPointofTriangleList(std::pair<int,int> TPID) const;
+	//const CTriangle::SPoint3D* GetPointofTriangleList(std::pair<int,int> TPID) const;
     CGraph* GetGraph();
     //int updateNVertices() { this->m_nNVertices = this->m_nNVertices*4-6; }
 

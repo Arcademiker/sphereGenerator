@@ -112,9 +112,12 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 		//todo one switch variable enough
         m_nMeshSwitcher = 1 - m_nMeshSwitcher;
         m_nGraphSwitcher = 1 - m_nGraphSwitcher;
+
+        m_dualTriangleList[1 - m_nMeshSwitcher]->clear();
         //std::cout << "!" << i << " " << m_dualTriangleList[m_nMeshSwitcher]->size() << ", " << m_dualGraph[m_nGraphSwitcher]->getSize() << ", " << m_dualGraph[m_nGraphSwitcher]->getNTriangles() << std::endl;
 	}
     //todo delte smaller triangle
+
 	ComputeTextureCoordinates();
     ComputeTangentBitangent();
 }
@@ -255,7 +258,10 @@ void CTriangleTesselation::GenerateTetraeder()
 	
 	m_dualTriangleList[0]->clear();
 	m_dualTriangleList[1]->clear();
+    m_dualGraph[0]->reconstructGraph(m_nNVertices);
+    m_dualGraph[1]->reconstructGraph(m_nNVertices);
 	m_nMeshSwitcher = 0;
+    m_nGraphSwitcher = 0;
 
     /* //tetraeder
 	CTriangle::SPoint3D Point1;
@@ -463,8 +469,9 @@ CGraph* CTriangleTesselation::GetGraph() {
     return this->m_dualGraph[m_nGraphSwitcher];
 }
 
+/*
 const CTriangle::SPoint3D* CTriangleTesselation::GetPointofTriangleList(std::pair<int, int> TPID) const {
     return this->m_dualTriangleList[m_nMeshSwitcher]->at(TPID.first).GetPoints(TPID.second);
 }
-
+*/
 
