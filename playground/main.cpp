@@ -222,7 +222,7 @@ int main( )
 
 
     /// generate sphere object:
-    CTriangleTesselation triangleTesselation(0.5f,3);
+    CTriangleTesselation triangleTesselation(0.5f,7);
     //triangleTesselation.Tesselate(1);
     const std::vector<CTriangle>* triangles = triangleTesselation.GetTriangleList();
 
@@ -235,7 +235,7 @@ int main( )
     ///test AStar
 
     CAStar astar(triangleTesselation.GetGraph(),triangles);
-    astar.FindPath(7,4,20);
+    astar.FindPath(7,13,400);
     std::vector<int> route = *astar.getRoute();
     const std::vector<CTriangle::SPoint3D>* points = astar.getRoute3DPoints();
 
@@ -427,7 +427,7 @@ int main( )
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	//glBufferData(GL_ARRAY_BUFFER, triangles->size() * sizeof(CTriangle), &triangles->at(0), GL_STATIC_DRAW);
 
-    ///glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 
     glm::mat4 ModelMatrix = glm::mat4();

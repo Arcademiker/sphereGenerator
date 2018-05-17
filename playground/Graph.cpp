@@ -102,7 +102,7 @@ void CGraph::reconstructGraph(size_t size) {
     //this->G3D = new std::vector<CTriangle::SPoint3D*>(size);
     this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
     this->m_edgeList = new std::unordered_map<int,int>;
-    this->edgeCounter = 0;
+    this->edgeCounter = 1;
     //this->edgeCounter = 0; //todo????
     this->triangleCounter = 0;
 }

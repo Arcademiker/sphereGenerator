@@ -107,7 +107,7 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
             m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTripleNew[0], vertexTripleNew[1], vertexTripleNew[2]);
 
 		}
-        oldGraphSize = static_cast<int>(m_dualGraph[1- m_nGraphSwitcher]->getSize());
+        oldGraphSize = static_cast<int>(m_dualGraph[1- m_nGraphSwitcher]->getSize())-1;
         //std::cout << "!" << i << " " << m_dualTriangleList[m_nMeshSwitcher]->size() << ", " << m_dualGraph[m_nGraphSwitcher]->getSize() << ", " << m_dualGraph[m_nGraphSwitcher]->getNTriangles() << std::endl;
 		//todo one switch variable enough
         m_nMeshSwitcher = 1 - m_nMeshSwitcher;

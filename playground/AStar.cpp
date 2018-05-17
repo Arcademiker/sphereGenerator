@@ -9,6 +9,7 @@ CAStar::CAStar(CGraph *graph,const std::vector<CTriangle>* p3DMesh) {
     this->p3DMesh = p3DMesh;
     this->pOutBuffer = new std::vector<int>;
     this->pRoute3DPoints = new std::vector<CTriangle::SPoint3D>;
+    this->normEdgeLength = 1.0f/this->HEuclidean(p3DMesh->at(0).GetPoints(0)->fPos,p3DMesh->at(0).GetPoints(1)->fPos);
 }
 
 CAStar::~CAStar() {
@@ -50,7 +51,7 @@ int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int n
     //explore start vertex (which means calculating f(n) score for this vertex): f(n) = h(n)+g(n)
     //g(n) := dijsktra distance from start to current vertex. for the start vertex = 0
     //h(n) := manhattan distance form target to current vertex ignoring all possible walls on the way. h(n) the heuristic for this A*
-    explorationAgenda->Add(HScore(fPos,fPosTarget),vertexIDStart);
+    explorationAgenda->Add(HScore(fPos,fPosTarget)*this->normEdgeLength,vertexIDStart);
 
     //pGScore = g(n) ; key = vertexID , value = GScore
     //why hash map, why not a vector?
@@ -130,7 +131,7 @@ int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int n
                     pParentNode->insert(std::make_pair(d, vertexID));
                     //visit up and write FScore (f(n)=h(n)+g(n)) as key into the priority queue
                     fPos = this->get3DPoint(vertexID)->fPos;
-                    explorationAgenda->Add(HScore(fPos, fPosTarget) + itVisited.first->second, d);
+                    explorationAgenda->Add(HScore(fPos, fPosTarget)*this->normEdgeLength + itVisited.first->second, d);
                 }
             }
         }
@@ -175,12 +176,40 @@ const CTriangle::SPoint3D* CAStar::get3DPoint(int vertexID) const {
     return this->p3DMesh->at(TPID.first).GetPoints(TPID.second);
 }
 
-//todo: quadrat of hscore ok? scalieren!
-float CAStar::HScore(glm::vec3 fPos, glm::vec3 fPosTarget) {
+
+//Euclidean distance:
+float CAStar::HEuclidean(glm::vec3 fPos, glm::vec3 fPosTarget) {
     return glm::sqrt((fPos.x-fPosTarget.x)*(fPos.x-fPosTarget.x)
            +(fPos.y-fPosTarget.y)*(fPos.y-fPosTarget.y)
            +(fPos.z-fPosTarget.z)*(fPos.z-fPosTarget.z));
 }
+
+
+//3D Diagonal Distance 24-way method (based on 8-way method)
+float CAStar::HScore(glm::vec3 fPos, glm::vec3 fPosTarget) {
+    float Root2 = 1.41421;
+    float Root3 = 1.73205;
+    float deltax = glm::abs(fPos.x-fPosTarget.x);
+    float deltay = glm::abs(fPos.y-fPosTarget.y);
+    float deltaz = glm::abs(fPos.z-fPosTarget.z);
+
+    float min_xy = glm::min(deltax,deltay);
+    float d_min = glm::min(min_xy,deltaz);
+    float max_xy = glm::max(deltax,deltay);
+    float d_max = glm::max(max_xy,deltaz);
+    //median of 3 elements := max(min(x,y), min(max(x,y),z));
+    float d_median = glm::max(min_xy, glm::min(max_xy,deltaz));
+
+    return Root3*d_min+Root2*(d_median-d_min)+d_max-d_median;
+}
+
+
+/*
+//3D Diagonal Distance
+float CAStar::HScore(glm::vec3 fPos, glm::vec3 fPosTarget) {
+    return glm::max(glm::max(glm::abs(fPos.x-fPosTarget.x),glm::abs(fPos.y-fPosTarget.y)),glm::abs(fPos.z-fPosTarget.z));
+}
+*/
 
 std::vector<int>* CAStar::getRoute() {
     return this->pOutBuffer;

@@ -21,8 +21,10 @@ private:
     const std::vector<CTriangle>* p3DMesh;
     std::vector<int>* pOutBuffer;
     std::vector<CTriangle::SPoint3D>* pRoute3DPoints;
+    float normEdgeLength;
 
     const CTriangle::SPoint3D* get3DPoint(int vertexID) const;
+    float HEuclidean(glm::vec3 fPos, glm::vec3 fPosTarget);
     float HScore(glm::vec3 fPos, glm::vec3 fPosTarget);
 
 public:
