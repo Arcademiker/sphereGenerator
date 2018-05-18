@@ -57,8 +57,10 @@ bool CGraph::addEdge(int u, int v, int w) {
         //todo: more intelligent insertion check
         this->G->at(u).insert({v,edgeCounter}); // = edgeCounter;
         this->G->at(v).insert({u,-edgeCounter});
-        (*this->m_edgeList)[edgeCounter] = u; //pair for weights w
-        (*this->m_edgeList)[-edgeCounter] = v;
+
+        //fill edge weights in edge list
+        (*this->m_edgeList)[edgeCounter] = w; //pair for weights w
+        (*this->m_edgeList)[-edgeCounter] = w;
         edgeCounter++;
         //todo: add edge w=weight list
         //this->printGraph();
@@ -69,13 +71,13 @@ bool CGraph::addEdge(int u, int v, int w) {
 
 
 
-void CGraph::addTriangle(int point1, int point2, int point3) {
+void CGraph::addTriangle(int point1, int point2, int point3, std::vector<int> path) {
     //todo split pair<ID,SP3D> into id -> add edge and add SP3D to vertexSP3D table
-    addEdge(point1, point2,1);
+    addEdge(point1, point2,path[0]);
 
-    addEdge(point2, point3,1);
+    addEdge(point2, point3,path[1]);
 
-    addEdge(point3, point1,1);
+    addEdge(point3, point1,path[2]);
     std::vector<int> triangle {point1,point2,point3}; //tood 3dpoints
     this->m_matPointsofTraingle->push_back(triangle);
 
@@ -129,7 +131,7 @@ size_t CGraph::getSize() {
 }
 
 
-int CGraph::getVerticesOfEdge(int e) {
+int CGraph::getEdgeWeight(int e) {
     //todo return edge pointing on vertex withing specific triangle
     return this->m_edgeList->at(e);
 }
@@ -141,6 +143,8 @@ std::unordered_map<int,int> CGraph::getAdjacent(int u) {
 int CGraph::getNTriangles() {
     return this->triangleCounter;
 }
+
+
 
 
 

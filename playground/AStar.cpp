@@ -76,20 +76,32 @@ int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int n
     //current visited vertex
     int vertexID = vertexIDStart;
 
+    //distance in steps (ignoring edge weights)
+    int steps = 0;
+
     //main loop of the A* algorithm
-    while(nOutBufferSize>nPathLength && !explorationAgenda->IsEmpty()) {
+    while(nPathLength < nOutBufferSize && !explorationAgenda->IsEmpty()) {
 
         //set the current vertex (nNode) to the vertex with the highest exploration priority (lowest f(n) Score)
         vertexID = explorationAgenda->VisitTop();
-        nPathLength = (*pGScore)[vertexID]; //path length in number of steps
+
+        //total path length with respect to edge weights
+        nPathLength = (*pGScore)[vertexID];
 
         //abort if target vertex is reached
         if (vertexIDTarget==vertexID) {
+
+            //count steps to start
+            while((*pParentNode)[vertexID] != vertexID) {
+                vertexID = (*pParentNode)[vertexID];
+                steps++;
+            }
+            vertexID = vertexIDTarget;
             //create list of 3Dpoints for opengl draw routine
             delete this->pRoute3DPoints;
-            this->pRoute3DPoints = new std::vector<CTriangle::SPoint3D>(nPathLength+1);
+            this->pRoute3DPoints = new std::vector<CTriangle::SPoint3D>(steps+1);
             //find the shortest way back from the target to the start
-            for(int i=nPathLength; i>0; i--) {
+            for(int i=steps; i>0; i--) {
                 (*pOutBuffer)[i-1] = vertexID;
                 (*pRoute3DPoints)[i] = *this->get3DPoint(vertexID);
                 vertexID = (*pParentNode)[vertexID];
@@ -101,7 +113,8 @@ int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int n
             break;
         }
 
-        //calculate the adjacent nodes of nNode (current Node)
+
+        //calculate the adjacent nodes of the current vertex
         for (auto u : this->graph->getAdjacent(vertexID)) {
             nDir.push_back(u.first);
         }
@@ -126,7 +139,7 @@ int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int n
                 //don't visit the same vertex twice
                 if (itVisited.second) {
                     //set the g(n) Score (without doing a second hashmap traversal) by raising the old g(n) by 1
-                    itVisited.first->second = (*pGScore)[vertexID] + 1;
+                    itVisited.first->second = (*pGScore)[vertexID] + this->graph->getEdgeWeight(this->graph->getAdjacent(vertexID).at(d)  );
                     //keep track of the last visited vertex to find the shortest way back
                     pParentNode->insert(std::make_pair(d, vertexID));
                     //visit up and write FScore (f(n)=h(n)+g(n)) as key into the priority queue
@@ -187,8 +200,8 @@ float CAStar::HEuclidean(glm::vec3 fPos, glm::vec3 fPosTarget) {
 
 //3D Diagonal Distance 24-way method (based on 8-way method)
 float CAStar::HScore(glm::vec3 fPos, glm::vec3 fPosTarget) {
-    float Root2 = 1.41421;
-    float Root3 = 1.73205;
+    float Root2 = 1.41421f;
+    float Root3 = 1.73205f;
     float deltax = glm::abs(fPos.x-fPosTarget.x);
     float deltay = glm::abs(fPos.y-fPosTarget.y);
     float deltaz = glm::abs(fPos.z-fPosTarget.z);

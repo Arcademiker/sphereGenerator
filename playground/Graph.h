@@ -7,18 +7,12 @@
 #include <vector>
 #include <iostream>
 #include <unordered_map>
-#include "Triangle.h"
+//#include "Triangle.h"
+
+
 
 class CGraph {
 private:
-    /*
-    struct SPoint3D
-    {
-        glm::vec3 fPos = glm::vec3(0.0f, 0.0f, 0.0f); //same as normals
-        glm::vec2 fUV = glm::vec2(0.0f,0.0f);
-        glm::vec3 fT = glm::vec3(0.0f,0.0f,0.0f);
-    };
-     */
     std::vector<std::unordered_map<int,int>>* G;
     std::vector<std::pair<int,int>>* G3DTable;
     //std::pair<std::unordered_map<int,int>::iterator, bool> itAdjcent;
@@ -28,14 +22,16 @@ private:
     int edgeCounter;
     int triangleCounter;
 
+
+
 public:
     CGraph(size_t size);
     ~CGraph();
     //std::vector<CTriangle::SPoint3D*>* G3D; //todo addEdge and datastructure changes
     bool addEdge(int u, int v, int w);
-    int getVerticesOfEdge(int e);
+    int getEdgeWeight(int e);
     std::unordered_map<int,int> getAdjacent(int u);
-    void addTriangle(int point1,int point2,int point3);
+    void addTriangle(int point1,int point2,int point3, std::vector<int> path);
     std::pair<int,int> get3DPointIDofVertexID(int VertexID);
     void reconstructGraph(size_t size);
     std::vector<int> getPointsofTriangle(int triangleID);

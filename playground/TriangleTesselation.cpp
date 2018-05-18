@@ -17,6 +17,8 @@ CTriangleTesselation::CTriangleTesselation(float fRadius, uint32_t nIterations)
     //this->m_nNVertices = this->m_nNVertices*4-6;
     this->m_dualGraph[1] = new CGraph(this->m_nNVertices);
 
+    this->heightMap = new cv::Mat(4096,8192,CV_64FC1);
+
     //GenerateGraph();
     GenerateTetraeder();
     Tesselate(nIterations);
@@ -29,10 +31,12 @@ CTriangleTesselation::~CTriangleTesselation()
 	delete m_dualTriangleList[1];
     delete m_dualGraph[0];
     delete m_dualGraph[1];
+    delete heightMap;
 }
 
 void CTriangleTesselation::Tesselate(uint32_t nIterations)
 {
+    static float fPI = 3.1415926f;
     int oldGraphSize = static_cast<int>(m_dualGraph[m_nGraphSwitcher]->getSize())-1;
     int tmpEdgeID;
 	for (size_t i = 0; i < nIterations;++i)
@@ -75,6 +79,23 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
             PointNew3.fPos = glm::normalize(PointNew3.fPos);
             PointNew3.fPos = PointNew3.fPos * m_fRadius;
 
+            //uv coordintes calculation
+            Point1.fUV.x = 0.5f+atan2f(Point1.fPos.x / m_fRadius, Point1.fPos.z / m_fRadius)/(2.0f*fPI);
+            Point2.fUV.x = 0.5f+atan2f(Point2.fPos.x / m_fRadius, Point2.fPos.z / m_fRadius)/(2.0f*fPI);
+            Point3.fUV.x = 0.5f+atan2f(Point3.fPos.x / m_fRadius, Point3.fPos.z / m_fRadius)/(2.0f*fPI);
+            CorrectTextureOverflowU(Point1,Point2,Point3);
+            Point1.fUV.y = 0.5f-asinf(Point1.fPos.y / m_fRadius)/fPI;
+            Point2.fUV.y = 0.5f-asinf(Point2.fPos.y / m_fRadius)/fPI;
+            Point3.fUV.y = 0.5f-asinf(Point3.fPos.y / m_fRadius)/fPI;
+
+            PointNew1.fUV.x = 0.5f+atan2f(PointNew1.fPos.x / m_fRadius, PointNew1.fPos.z / m_fRadius)/(2.0f*fPI);
+            PointNew2.fUV.x = 0.5f+atan2f(PointNew2.fPos.x / m_fRadius, PointNew2.fPos.z / m_fRadius)/(2.0f*fPI);
+            PointNew3.fUV.x = 0.5f+atan2f(PointNew3.fPos.x / m_fRadius, PointNew3.fPos.z / m_fRadius)/(2.0f*fPI);
+            CorrectTextureOverflowU(PointNew1,PointNew2,PointNew3);
+            PointNew1.fUV.y = 0.5f-asinf(PointNew1.fPos.y / m_fRadius)/fPI;
+            PointNew2.fUV.y = 0.5f-asinf(PointNew2.fPos.y / m_fRadius)/fPI;
+            PointNew3.fUV.y = 0.5f-asinf(PointNew3.fPos.y / m_fRadius)/fPI;
+
 
             //check edge of adjacent triangle (add inner edges in adjazent triangle tesselation step)
             for(int t = 0; t<3; t++) {
@@ -95,16 +116,16 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
             //todo find more safer and elegant solution
 
 			m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point1,    PointNew3, PointNew2));
-            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[0],    vertexTripleNew[2], vertexTripleNew[1]);
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[0],    vertexTripleNew[2], vertexTripleNew[1],calcEdgeWeight(CTriangle(Point1,    PointNew3, PointNew2)));
 
             m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point2,    PointNew1, PointNew3));
-            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[1],    vertexTripleNew[0], vertexTripleNew[2]);
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[1],    vertexTripleNew[0], vertexTripleNew[2],calcEdgeWeight(CTriangle(Point2,    PointNew1, PointNew3)));
 
             m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(Point3,    PointNew2, PointNew1));
-            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[2],    vertexTripleNew[1], vertexTripleNew[0]);
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTriple[2],    vertexTripleNew[1], vertexTripleNew[0],calcEdgeWeight(CTriangle(Point3,    PointNew2, PointNew1)));
 
             m_dualTriangleList[1 - m_nMeshSwitcher]->push_back(CTriangle(PointNew1, PointNew2, PointNew3));
-            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTripleNew[0], vertexTripleNew[1], vertexTripleNew[2]);
+            m_dualGraph[1 - m_nGraphSwitcher]->addTriangle(vertexTripleNew[0], vertexTripleNew[1], vertexTripleNew[2],calcEdgeWeight(CTriangle(PointNew1, PointNew2, PointNew3)));
 
 		}
         oldGraphSize = static_cast<int>(m_dualGraph[1- m_nGraphSwitcher]->getSize())-1;
@@ -118,7 +139,7 @@ void CTriangleTesselation::Tesselate(uint32_t nIterations)
 	}
     //todo delte smaller triangle
 
-	ComputeTextureCoordinates();
+	//ComputeTextureCoordinates();
     ComputeTangentBitangent();
 }
 
@@ -144,44 +165,44 @@ float CalculateAngle(float fX, float fY)
 }
 */
 
-void CorrectTextureOverflowU(CTriangle& Triangle)
+void CTriangleTesselation::CorrectTextureOverflowU(CTriangle::SPoint3D& Point1,CTriangle::SPoint3D& Point2,CTriangle::SPoint3D& Point3)
 {
-	static float fPI = 3.1415926f;
-	CTriangle::SPoint3D* Point1 = Triangle.GetPoint1();
-	CTriangle::SPoint3D* Point2 = Triangle.GetPoint2();
-	CTriangle::SPoint3D* Point3 = Triangle.GetPoint3();
+	//static float fPI = 3.1415926f;
+	//CTriangle::SPoint3D* Point1 = Triangle.GetPoint1();
+	//CTriangle::SPoint3D* Point2 = Triangle.GetPoint2();
+	//CTriangle::SPoint3D* Point3 = Triangle.GetPoint3();
 
-	if (fabsf(Point1->fUV.x - Point2->fUV.x) > 0.5)
+	if (fabsf(Point1.fUV.x - Point2.fUV.x) > 0.5)
 	{
-		if (Point1->fUV.x < Point2->fUV.x)
+		if (Point1.fUV.x < Point2.fUV.x)
 		{	
-			Point1->fUV.x += 1.0f;//2.0f * fPI;
+			Point1.fUV.x += 1.0f;//2.0f * fPI;
 		}
 		else
 		{
-			Point2->fUV.x += 1.0f;//2.0f * fPI;
+			Point2.fUV.x += 1.0f;//2.0f * fPI;
 		}
 	}
-	if (fabsf(Point2->fUV.x - Point3->fUV.x) > 0.5)
+	if (fabsf(Point2.fUV.x - Point3.fUV.x) > 0.5)
 	{
-		if (Point2->fUV.x < Point3->fUV.x)
+		if (Point2.fUV.x < Point3.fUV.x)
 		{
-			Point2->fUV.x += 1.0f;//2.0f * fPI;
+			Point2.fUV.x += 1.0f;//2.0f * fPI;
 		}
 		else
 		{
-			Point3->fUV.x += 1.0f;//2.0f * fPI;
+			Point3.fUV.x += 1.0f;//2.0f * fPI;
 		}
 	}
-    if (fabsf(Point1->fUV.x - Point3->fUV.x) > 0.5)
+    if (fabsf(Point1.fUV.x - Point3.fUV.x) > 0.5)
     {
-        if (Point1->fUV.x < Point3->fUV.x)
+        if (Point1.fUV.x < Point3.fUV.x)
         {
-            Point1->fUV.x += 1.0f;//2.0f * fPI;
+            Point1.fUV.x += 1.0f;//2.0f * fPI;
         }
         else
         {
-            Point3->fUV.x += 1.0f;//2.0f * fPI;
+            Point3.fUV.x += 1.0f;//2.0f * fPI;
         }
     }
 }
@@ -197,7 +218,7 @@ void CTriangleTesselation::ComputeTextureCoordinates()
         Point1->fUV.x = 0.5f+atan2f(Point1->fPos.x / m_fRadius, Point1->fPos.z / m_fRadius)/(2.0f*fPI);
         Point2->fUV.x = 0.5f+atan2f(Point2->fPos.x / m_fRadius, Point2->fPos.z / m_fRadius)/(2.0f*fPI);
         Point3->fUV.x = 0.5f+atan2f(Point3->fPos.x / m_fRadius, Point3->fPos.z / m_fRadius)/(2.0f*fPI);
-        CorrectTextureOverflowU(m_dualTriangleList[m_nMeshSwitcher]->at(nIterator));
+        CorrectTextureOverflowU(*Point1,*Point2,*Point3); //m_dualTriangleList[m_nMeshSwitcher]->at(nIterator));
         Point1->fUV.y = 0.5f-asinf(Point1->fPos.y / m_fRadius)/fPI;
         Point2->fUV.y = 0.5f-asinf(Point2->fPos.y / m_fRadius)/fPI;
         Point3->fUV.y = 0.5f-asinf(Point3->fPos.y / m_fRadius)/fPI;
@@ -391,6 +412,9 @@ void CTriangleTesselation::GenerateTetraeder()
     PointC.fPos = PointC.fPos * m_fRadius;
 
 
+
+
+
     //northpol
     m_dualTriangleList[0]->push_back(CTriangle(Point7, Point5, Point1));
     m_dualTriangleList[0]->push_back(CTriangle(Point7, Point2, Point5));
@@ -415,30 +439,33 @@ void CTriangleTesselation::GenerateTetraeder()
     m_dualTriangleList[0]->push_back(CTriangle(Point1, Point3, PointA));
     m_dualTriangleList[0]->push_back(CTriangle(Point3, Point8, PointA));
 
+    ComputeTextureCoordinates();
+
+    this->loadHeightMap();
     //create logical triangle for graph traversal A=10, B=11, C=0
     //northpol
-    this->m_dualGraph[0]->addTriangle( 7,  5,  1);
-    this->m_dualGraph[0]->addTriangle( 7,  2,  5);
-    this->m_dualGraph[0]->addTriangle( 7,  0,  2);
-    this->m_dualGraph[0]->addTriangle( 7, 10,  0);
-    this->m_dualGraph[0]->addTriangle( 7,  1, 10);
+    this->m_dualGraph[0]->addTriangle( 7,  5,  1,calcEdgeWeight(CTriangle(Point7, Point5, Point1)));
+    this->m_dualGraph[0]->addTriangle( 7,  2,  5,calcEdgeWeight(CTriangle(Point7, Point2, Point5)));
+    this->m_dualGraph[0]->addTriangle( 7,  0,  2,calcEdgeWeight(CTriangle(Point7, PointC, Point2)));
+    this->m_dualGraph[0]->addTriangle( 7, 10,  0,calcEdgeWeight(CTriangle(Point7, PointA, PointC)));
+    this->m_dualGraph[0]->addTriangle( 7,  1, 10,calcEdgeWeight(CTriangle(Point7, Point1, PointA)));
     //southpol
-    this->m_dualGraph[0]->addTriangle( 6,  4,  8);
-    this->m_dualGraph[0]->addTriangle( 6,  8,  3);
-    this->m_dualGraph[0]->addTriangle( 6,  3,  9);
-    this->m_dualGraph[0]->addTriangle( 6,  9, 11);
-    this->m_dualGraph[0]->addTriangle( 6, 11,  4);
+    this->m_dualGraph[0]->addTriangle( 6,  4,  8,calcEdgeWeight(CTriangle(Point6, Point4, Point8)));
+    this->m_dualGraph[0]->addTriangle( 6,  8,  3,calcEdgeWeight(CTriangle(Point6, Point8, Point3)));
+    this->m_dualGraph[0]->addTriangle( 6,  3,  9,calcEdgeWeight(CTriangle(Point6, Point3, Point9)));
+    this->m_dualGraph[0]->addTriangle( 6,  9, 11,calcEdgeWeight(CTriangle(Point6, Point9, PointB)));
+    this->m_dualGraph[0]->addTriangle( 6, 11,  4,calcEdgeWeight(CTriangle(Point6, PointB, Point4)));
     //belt
-    this->m_dualGraph[0]->addTriangle(10,  8,  0);
-    this->m_dualGraph[0]->addTriangle( 8,  4,  0);
-    this->m_dualGraph[0]->addTriangle( 0,  4,  2);
-    this->m_dualGraph[0]->addTriangle( 4, 11,  2);
-    this->m_dualGraph[0]->addTriangle( 2, 11,  5);
-    this->m_dualGraph[0]->addTriangle(11,  9,  5);
-    this->m_dualGraph[0]->addTriangle( 5,  9,  1);
-    this->m_dualGraph[0]->addTriangle( 9,  3,  1);
-    this->m_dualGraph[0]->addTriangle( 1,  3, 10);
-    this->m_dualGraph[0]->addTriangle( 3,  8, 10);
+    this->m_dualGraph[0]->addTriangle(10,  8,  0,calcEdgeWeight(CTriangle(PointA, Point8, PointC)));
+    this->m_dualGraph[0]->addTriangle( 8,  4,  0,calcEdgeWeight(CTriangle(Point8, Point4, PointC)));
+    this->m_dualGraph[0]->addTriangle( 0,  4,  2,calcEdgeWeight(CTriangle(PointC, Point4, Point2)));
+    this->m_dualGraph[0]->addTriangle( 4, 11,  2,calcEdgeWeight(CTriangle(Point4, PointB, Point2)));
+    this->m_dualGraph[0]->addTriangle( 2, 11,  5,calcEdgeWeight(CTriangle(Point2, PointB, Point5)));
+    this->m_dualGraph[0]->addTriangle(11,  9,  5,calcEdgeWeight(CTriangle(PointB, Point9, Point5)));
+    this->m_dualGraph[0]->addTriangle( 5,  9,  1,calcEdgeWeight(CTriangle(Point5, Point9, Point1)));
+    this->m_dualGraph[0]->addTriangle( 9,  3,  1,calcEdgeWeight(CTriangle(Point9, Point3, Point1)));
+    this->m_dualGraph[0]->addTriangle( 1,  3, 10,calcEdgeWeight(CTriangle(Point1, Point3, PointA)));
+    this->m_dualGraph[0]->addTriangle( 3,  8, 10,calcEdgeWeight(CTriangle(Point3, Point8, PointA)));
 
     //rim
     //m_dualTriangleList[0]->push_back(CTriangle(Point2, Point1, Point3));
@@ -475,3 +502,48 @@ const CTriangle::SPoint3D* CTriangleTesselation::GetPointofTriangleList(std::pai
 }
 */
 
+void CTriangleTesselation::loadHeightMap() {
+    std::cout << "load heightmap for edge weights... " << std::endl;
+    *this->heightMap = cv::imread("../playground/earthHeightmap8k.png", CV_LOAD_IMAGE_GRAYSCALE);
+    if(! this->heightMap->data )                              // Check for invalid input
+    {
+        std::cout <<  "OpenCV: Could not open or find the image" << std::endl ;
+        return;
+    }
+
+
+    for(int y = 1000; y < 1200 ; y+=10) {
+        for (int x = 1000; x < 1200; x+=10) {
+            std::cout << this->heightMap->at<float>(x,y) << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    return;
+}
+
+std::vector<int> CTriangleTesselation::calcEdgeWeight(CTriangle triangle) {
+    std::vector<int> path(3,1);
+    if(this->heightMap->at<double>(static_cast<int>(triangle.GetPoint1()->fUV.y*4096.0f),static_cast<int>(triangle.GetPoint1()->fUV.x*8192.0f)) < 0.001)
+    {
+        path[0] = 10;
+        std::cout << "water" << static_cast<int>(triangle.GetPoint1()->fUV.y*4096.0f) << std::endl;
+    } else {
+        std::cout << "land" << std::endl;
+    }
+    if(this->heightMap->at<double>(static_cast<int>(triangle.GetPoint2()->fUV.y*4096.0f),static_cast<int>(triangle.GetPoint2()->fUV.x*8192.0f)) < 0.001)
+    {
+        path[1] = 10;
+        std::cout << "water" << this->heightMap->at<double>(static_cast<int>(triangle.GetPoint2()->fUV.y*4096.0f),static_cast<int>(triangle.GetPoint2()->fUV.x*8192.0f)) << std::endl;
+    } else {
+        std::cout << "land" << std::endl;
+    }
+    if(this->heightMap->at<double>(static_cast<int>(triangle.GetPoint3()->fUV.y*4096.0f),static_cast<int>(triangle.GetPoint3()->fUV.x*8192.0f)) < 0.001)
+    {
+        path[2] = 10;
+        std::cout << "water" << triangle.GetPoint1()->fUV.y << std::endl;
+    } else {
+        std::cout << "land" << std::endl;
+    }
+    return path;
+}

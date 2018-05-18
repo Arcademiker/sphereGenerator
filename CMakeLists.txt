@@ -5,6 +5,7 @@ project (sphereGenerator)
 set(CMAKE_CXX_STANDARD 11)
 find_package(OpenGL REQUIRED)
 #find_package(SOIL REQUIRED)
+find_package(OpenCV REQUIRED core imgproc imgcodecs highgui)
 
 
 # Compile external dependencies
@@ -13,7 +14,13 @@ add_subdirectory (external)
 #windows path to SOIL
 #link_directories("c:/soil-master/build")
 
+#path to your opencv directory if path variable not set globaly
+#set(OpenCV_DIR "~/opencv_tmp/release")
+
+
+
 include_directories(
+	${OpenCV_INCLUDE_DIRS}
 	external/AntTweakBar-1.16/include/
 	external/glfw-3.1.2/include/
 	external/glm-0.9.7.1/
@@ -58,7 +65,7 @@ add_executable(playground
 
 #libSOIL.a for loading textures
 target_link_libraries(playground
-	${ALL_LIBS} libSOIL.a
+	${ALL_LIBS} libSOIL.a ${OpenCV_LIBS}
 )
 
 
