@@ -31,7 +31,7 @@ GLFWwindow* window;
 
 #include <common/shader.hpp>
 //#include <common/texture.hpp>
-#include <common/controls.hpp>
+//#include <common/controls.hpp>
 //#include <common/objloader.hpp>
 
 //#include <assimp/Importer.hpp>
@@ -70,7 +70,7 @@ int main( )
     // Open a window and create its OpenGL context
     int resWidth = 1920;
     int resHeight = 1080;
-	window = glfwCreateWindow( resWidth, resHeight, "Tutorial 07 - Model Loading", NULL, NULL);
+	window = glfwCreateWindow( resWidth, resHeight, "3DAStar", NULL, NULL);
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an older Intel GPU, they are not 3.3 compatible."
                 " Try the 2.1 version of the tutorials.\n" );
@@ -106,7 +106,7 @@ int main( )
 
 
     ///controller cam-->
-	/*
+
     float horizontalAngle = 0;//-0.5f*3.14f;
     // Initial vertical angle : none
     float verticalAngle = 0;//3.14f+0.5f;//2*3.14f;
@@ -123,7 +123,7 @@ int main( )
     glm::vec3 up = glm::cross( right, direction );
     float aspectRatio = static_cast<float>(resWidth)/static_cast<float>(resHeight);
     CCamera pCamera(glm::radians(45.0f), aspectRatio,0.001f, 5.0f, glm::vec3( 0, 0, 0 ),direction,up );
-	*/
+
     ///<--cam
 
     // Set the mouse at the center of the screen
@@ -134,6 +134,19 @@ int main( )
 	//glClearColor(0.9f, 1.0f, 0.9f, 0.0f);
 	// Dark background
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    //MSAA
+    GLuint tex;
+    GLuint fbo;
+
+    glGenTextures( 1, &tex );
+    glBindTexture( GL_TEXTURE_2D_MULTISAMPLE, tex );
+    glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, resWidth, resHeight, false );
+
+    glGenFramebuffers( 1, &fbo );
+    glBindFramebuffer( GL_FRAMEBUFFER, fbo );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, tex, 0 );
+
 
 
 
@@ -167,6 +180,8 @@ int main( )
     GLuint MatrixID2line = glGetUniformLocation(programID2, "MVP");
 
 	GLuint MatrixID3 = glGetUniformLocation(programID1, "ViewMatrix");
+
+    GLuint ColorID = glGetUniformLocation(programID2, "drawcolor");
 
 
 
@@ -222,7 +237,7 @@ int main( )
 
 
     /// generate sphere object:
-    CTriangleTesselation triangleTesselation(0.5f,2);
+    CTriangleTesselation triangleTesselation(0.5f,5);
     //triangleTesselation.Tesselate(1);
     const std::vector<CTriangle>* triangles = triangleTesselation.GetTriangleList();
 
@@ -230,16 +245,27 @@ int main( )
 
     ///test Graph
 
-    triangleTesselation.GetGraph()->printGraph();
+    //triangleTesselation.GetGraph()->printGraph();
+
+
+    //for(int i=1; i<= 30/*triangleTesselation.GetGraph()->getEdgeCounter()*/; i++)
+    //{
+    //    std::cout << triangleTesselation.GetGraph()->getEdgeWeight(i)
+    //     << "\t--\t" << triangleTesselation.GetGraph()->getEdgeWeight(-i) << std::endl;
+    //}
 
     ///test AStar
 
     CAStar astar(triangleTesselation.GetGraph(),triangles);
-    //astar.FindPath(187,27,500);
-    astar.FindPath(7,6,500);
+    //std::cout << "path length: " << astar.FindPath(12,5,500) << std::endl;
+    std::cout << "path length: " << astar.FindPath(187,27,500) << std::endl;
+    //astar.FindPath(7,6,500);
     std::vector<int> route = *astar.getRoute();
     const std::vector<CTriangle::SPoint3D>* points = astar.getRoute3DPoints();
+    const std::vector<CTriangle::SPoint3D>* expanse = astar.getExpansed3DPoints();
 
+    std::cout << "steps: " << astar.steps <<std::endl;
+    std::cout << "expansed Vertices: " << astar.expansedVertixes <<std::endl << "Path: ";
     for(auto v : route) {
         std::cout << v << " ";
     }
@@ -315,8 +341,8 @@ int main( )
 
 	// Load it into a VBO
 
-    GLuint VertexArrayID[2];
-    glGenVertexArrays(2, VertexArrayID);
+    GLuint VertexArrayID[3];
+    glGenVertexArrays(3, VertexArrayID);
     glBindVertexArray(VertexArrayID[0]);
 
     GLuint vertexbuffer1;
@@ -423,6 +449,26 @@ int main( )
     );
 
 
+    //expansed points
+    glBindVertexArray(VertexArrayID[2]);
+
+    GLuint vertexbuffer3;
+    glGenBuffers(1, &vertexbuffer3);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer3);
+    glBufferData(GL_ARRAY_BUFFER, expanse->size() * sizeof(CTriangle::SPoint3D), &expanse->at(0), GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer3);
+    glVertexAttribPointer(
+            0,                  // attribute
+            3,                  // size
+            GL_FLOAT,           // type
+            GL_FALSE,           // normalized?
+            sizeof(CTriangle::SPoint3D),    // stride
+            (void*)0            // array buffer offset
+    );
+
+
 	//GLuint uvbuffer;
 	//glGenBuffers(1, &uvbuffer);
 	//glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
@@ -430,15 +476,30 @@ int main( )
 
     ///glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-
     glm::mat4 ModelMatrix = glm::mat4();
     glm::mat4 ViewMatrix = glm::mat4();
     glm::mat4 ProjectionMatrix = glm::mat4();
-	//ModelMatrix = glm::rotate( ModelMatrix,3.141592f,glm::vec3(0.0f,0.0f,1.0f));
+
+    glm::vec3 linecolor = glm::vec3(1,1,0);
+    glm::vec3 pointcolor = glm::vec3(0.8,0.1,0.1);
+    ///ModelMatrix = glm::rotate( ModelMatrix,3.141592f,glm::vec3(0.0f,0.0f,1.0f));
     ///camera ini
+
+    //float lineWidth[2];
+    //glGetFloatv(GL_LINE_WIDTH_RANGE, lineWidth);
+    //std::cout << "linewidth" << lineWidth[0] << " " << lineWidth[1] << std::endl;
 
 
 	do{
+        if (glfwGetKey( window, GLFW_KEY_1 ) == GLFW_PRESS){
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        }
+        if (glfwGetKey( window, GLFW_KEY_2 ) == GLFW_PRESS){
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        }
+
+
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);   // Make sure no FBO is set as the draw framebuffer
 
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -447,18 +508,18 @@ int main( )
 		glUseProgram(programID1);
 
 		// Compute the MVP matrix from keyboard and mouse input
-		computeMatricesFromInputs();
-		ViewMatrix =  getViewMatrix();
-		ProjectionMatrix = getProjectionMatrix();
+		//computeMatricesFromInputs();
+		//ViewMatrix =  getViewMatrix();
+		//ProjectionMatrix = getProjectionMatrix();
 
 		//controller
-		///updateVPMatFromInput(&pCamera,0.004f);
-		///ProjectionMatrix = pCamera.GetProjectionMatrix();
-		///ViewMatrix = pCamera.GetViewMatrix();
+		updateVPMatFromInput(&pCamera,0.004f);
+		ProjectionMatrix = pCamera.GetProjectionMatrix();
+		ViewMatrix = pCamera.GetViewMatrix();
         //mat4 rotation;
         //rotation = glm::rotate(2.0f, vec3(0,1,0));
 
-        ModelMatrix = glm::rotate( ModelMatrix,0.001f,glm::vec3(0.0f,1.0f,0.0f));
+        ///ModelMatrix = glm::rotate( ModelMatrix,0.001f,glm::vec3(0.0f,1.0f,0.0f));
 
         //glm::rotate(0.1f,glm::vec3(0,1,0));
         glm::mat4 MV =  ViewMatrix * ModelMatrix;
@@ -553,6 +614,9 @@ int main( )
         */
 		//glDrawArrays(GL_TRIANGLES, 0, triangles->size() * sizeof(glm::vec3)*3 );  // /* ( 2 * sizeof(glm::vec3) + sizeof(glm::vec2)) */ /* 3 * 10 */ );
 
+
+
+
         glBindVertexArray(VertexArrayID[0]);
 		// Draw the triangles !
         glDrawArrays(GL_TRIANGLES, 0, triangles->size() * 3);
@@ -572,15 +636,31 @@ int main( )
         // Set our "myHeightmap" sampler to use Texture Unit 0
         glUniform1i(HeightmapIDline, 0);
 
+        glUniform3f(ColorID, linecolor.x, linecolor.y, linecolor.z);
+
         glBindVertexArray(VertexArrayID[1]);
         // Draw the Line !
+        //glEnable(GL_LINE_SMOOTH);
+        //glLineWidth(63);
         glDrawArrays(GL_LINE_STRIP, 0, points->size() );
         glBindVertexArray(0);
 
+        glUniform3f(ColorID, pointcolor.x, pointcolor.y, pointcolor.z);
+
+        glBindVertexArray(VertexArrayID[2]);
+        // Draw the Points !
+        glPointSize(5);
+        glDrawArrays(GL_POINTS, 0, expanse->size() );
+        glBindVertexArray(0);
 		//glDisableVertexAttribArray(0);
 		//glDisableVertexAttribArray(1);
         //glDisableVertexAttribArray(2);
         //glDisableVertexAttribArray(3);
+
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);   // Make sure no FBO is set as the draw framebuffer
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo); // Make sure your multisampled FBO is the read framebuffer
+        glDrawBuffer(GL_BACK);                       // Set the back buffer as the draw buffer
+        glBlitFramebuffer(0, 0, resWidth, resHeight, 0, 0, resWidth, resHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 		// Swap buffers
 		glfwSwapBuffers(window);
@@ -593,11 +673,12 @@ int main( )
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &vertexbuffer1);
     glDeleteBuffers(1, &vertexbuffer2);
+    glDeleteBuffers(1, &vertexbuffer3);
 	//glDeleteBuffers(1, &uvbuffer);
 	glDeleteProgram(programID1);
     glDeleteProgram(programID2);
 	glDeleteTextures(1, textures);
-	glDeleteVertexArrays(2, VertexArrayID);
+	glDeleteVertexArrays(3, VertexArrayID);
     //SOIL_free_image_data(TextureID);
 
 	// Close OpenGL window and terminate GLFW

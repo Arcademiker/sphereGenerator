@@ -4,6 +4,7 @@
 #include "Triangle.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <cmath>
 #include "Graph.h"
 // Include OpenCV for image loading
 #include "opencv2/imgproc.hpp"
@@ -30,7 +31,7 @@ private:
     void ComputeTangentBitangent();
     void ComputePointTangent(CTriangle::SPoint3D *Point);
     void loadHeightMap();
-    std::vector<int> calcEdgeWeight(CTriangle triangle);
+    void calcEdgeWeight();
     void CorrectTextureOverflowU(CTriangle::SPoint3D& Point1,CTriangle::SPoint3D& Point2,CTriangle::SPoint3D& Point3);
 
 	cv::Mat* heightMap;

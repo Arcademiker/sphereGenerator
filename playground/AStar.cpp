@@ -9,23 +9,26 @@ CAStar::CAStar(CGraph *graph,const std::vector<CTriangle>* p3DMesh) {
     this->p3DMesh = p3DMesh;
     this->pOutBuffer = new std::vector<int>;
     this->pRoute3DPoints = new std::vector<CTriangle::SPoint3D>;
-    this->normEdgeLength = 1.0f/this->HEuclidean(p3DMesh->at(0).GetPoints(0)->fPos,p3DMesh->at(0).GetPoints(1)->fPos);
+    this->explorationAgenda = new ExplorationAgenda();
+    //this->normEdgeLength = 1.0f/this->HEuclidean(p3DMesh->at(0).GetPoints(0)->fPos,p3DMesh->at(0).GetPoints(1)->fPos);
+    //this->normEdgeLength = 1.0f/this->HScore(p3DMesh->at(0).GetPoints(0)->fPos,p3DMesh->at(0).GetPoints(1)->fPos);
 }
 
 CAStar::~CAStar() {
     delete this->pOutBuffer;
     delete this->pRoute3DPoints;
+    delete this->explorationAgenda;
 }
 
 
 //todo: description
-int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int nOutBufferSize) {
+float CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int nOutBufferSize) {
 
     //exist a path variable
     bool bPath = false;
 
     //path length in steps (ignoring edge weights)
-    int nPathLength = 0;
+    float nPathLength = 0;
 
     //clear old pOutBuffer from last pathfinding (pOutBuffer stores the vertexIDs of the taken route)
     delete this->pOutBuffer;
@@ -47,11 +50,13 @@ int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int n
     //  The typical underlying implementation of a multimap is a balanced red/black tree.
     //  Repeated element removals from one of the extreme ends of a multimap has a good chance of skewing the tree,
     //  requiring frequent rebalancing of the entire tree. This is going to be an expensive operation.
-    auto explorationAgenda = new ExplorationAgenda();
+    delete this->explorationAgenda;
+    this->explorationAgenda = new ExplorationAgenda();
     //explore start vertex (which means calculating f(n) score for this vertex): f(n) = h(n)+g(n)
     //g(n) := dijsktra distance from start to current vertex. for the start vertex = 0
     //h(n) := manhattan distance form target to current vertex ignoring all possible walls on the way. h(n) the heuristic for this A*
-    explorationAgenda->Add(HScore(fPos,fPosTarget)*this->normEdgeLength,vertexIDStart);
+    //explorationAgenda->Add(HScore(fPos,fPosTarget)*this->normEdgeLength,vertexIDStart);
+    explorationAgenda->Add(HScore(fPos,fPosTarget),vertexIDStart);
 
     //pGScore = g(n) ; key = vertexID , value = GScore
     //why hash map, why not a vector?
@@ -59,9 +64,9 @@ int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int n
     // especially in modern games. The big advantage of unordered maps (hashmaps) is, they just keep track of the visited elements.
     // If A* has to operate just in a small corner of a big map, the whole map (in case of a vector) has to be set to 0 at first
     // to initialise the g(n) score values and would consume storage that is never needed the whole time the algorithm is in use.
-    auto pGScore = new std::unordered_map<int,int>();
+    auto pGScore = new std::unordered_map<int,float>();
     //iterator to work with unordered map (hash map)
-    std::pair<std::unordered_map<int,int>::iterator, bool> itVisited;
+    std::pair<std::unordered_map<int,float>::iterator, bool> itVisited;
     pGScore->insert(std::make_pair(vertexIDStart,0));
 
     //parent Tree to find the shortest path from target back to the start (key = vertex, value = parent)
@@ -77,13 +82,16 @@ int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int n
     int vertexID = vertexIDStart;
 
     //distance in steps (ignoring edge weights)
-    int steps = 0;
+    this->steps = 0;
+    this->expansedVertixes = 0;
 
     //main loop of the A* algorithm
-    while(nPathLength < nOutBufferSize && !explorationAgenda->IsEmpty()) {
+    //while(nPathLength < nOutBufferSize && !explorationAgenda->IsEmpty()) {
+    while(steps < nOutBufferSize && !explorationAgenda->IsEmpty()) {
 
         //set the current vertex (nNode) to the vertex with the highest exploration priority (lowest f(n) Score)
         vertexID = explorationAgenda->VisitTop();
+        expansedVertixes++;
 
         //total path length with respect to edge weights
         nPathLength = (*pGScore)[vertexID];
@@ -139,12 +147,13 @@ int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int n
                 //don't visit the same vertex twice
                 if (itVisited.second) {
                     //set the g(n) Score (without doing a second hashmap traversal) by raising the old g(n) by 1
-                    itVisited.first->second = (*pGScore)[vertexID] + this->graph->getEdgeWeight(this->graph->getAdjacent(vertexID).at(d)  );
+                    itVisited.first->second = (*pGScore)[vertexID] + this->graph->getEdgeWeight(this->graph->getAdjacent(vertexID).at(d));
                     //keep track of the last visited vertex to find the shortest way back
                     pParentNode->insert(std::make_pair(d, vertexID));
                     //visit up and write FScore (f(n)=h(n)+g(n)) as key into the priority queue
                     fPos = this->get3DPoint(vertexID)->fPos;
-                    explorationAgenda->Add(HScore(fPos, fPosTarget)*this->normEdgeLength + itVisited.first->second, d);
+                    //explorationAgenda->Add(HScore(fPos, fPosTarget)*this->normEdgeLength + itVisited.first->second, d);
+                    explorationAgenda->Add(HScore(fPos, fPosTarget) + itVisited.first->second, d);
                 }
             }
         }
@@ -167,7 +176,6 @@ int CAStar::FindPath(int vertexIDStart, int vertexIDTarget, const unsigned int n
     }
     */
 
-    delete explorationAgenda;
     delete pParentNode;
     delete pGScore;
 
@@ -189,15 +197,16 @@ const CTriangle::SPoint3D* CAStar::get3DPoint(int vertexID) const {
     return this->p3DMesh->at(TPID.first).GetPoints(TPID.second);
 }
 
-
+/*
 //Euclidean distance:
 float CAStar::HEuclidean(glm::vec3 fPos, glm::vec3 fPosTarget) {
     return glm::sqrt((fPos.x-fPosTarget.x)*(fPos.x-fPosTarget.x)
            +(fPos.y-fPosTarget.y)*(fPos.y-fPosTarget.y)
            +(fPos.z-fPosTarget.z)*(fPos.z-fPosTarget.z));
 }
+ */
 
-
+/*
 //3D Diagonal Distance 24-way method (based on 8-way method)
 float CAStar::HScore(glm::vec3 fPos, glm::vec3 fPosTarget) {
     float Root2 = 1.41421f;
@@ -215,6 +224,18 @@ float CAStar::HScore(glm::vec3 fPos, glm::vec3 fPosTarget) {
 
     return Root3*d_min+Root2*(d_median-d_min)+d_max-d_median;
 }
+*/
+
+
+
+float CAStar::HScore(glm::vec3 fPos, glm::vec3 fPosTarget) {
+    //return glm::angle(fPos,fPosTarget);
+    fPos = glm::normalize(fPos);
+    fPosTarget = glm::normalize(fPosTarget);
+    return acos(glm::dot(fPos, fPosTarget));
+
+}
+
 
 
 /*
@@ -230,6 +251,14 @@ std::vector<int>* CAStar::getRoute() {
 
 const std::vector<CTriangle::SPoint3D> *CAStar::getRoute3DPoints() const{
     return this->pRoute3DPoints;
+}
+
+const std::vector<CTriangle::SPoint3D> *CAStar::getExpansed3DPoints() const {
+    auto expansed = new std::vector<CTriangle::SPoint3D>;
+    while (!explorationAgenda->IsEmpty()) {
+        expansed->push_back(*this->get3DPoint(this->explorationAgenda->VisitTop()));
+    }
+    return expansed;
 }
 
 

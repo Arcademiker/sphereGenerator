@@ -32,7 +32,7 @@ CGraph::CGraph(size_t size) {
     this->G3DTable = new std::vector<std::pair<int,int>>(size);
     //this->G = std::vector<std::unordered_map<int,int>>();
     this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
-    this->m_edgeList = new std::unordered_map<int,int>;
+    this->m_edgeList = new std::unordered_map<int,float>;
     this->edgeCounter = 1;
     this->triangleCounter = 0;
 }
@@ -47,7 +47,7 @@ CGraph::~CGraph() {
 
 
 ///water low weight but land to water high cost
-bool CGraph::addEdge(int u, int v, int w) {
+bool CGraph::addEdge(int u, int v, float w) {
     //e = edge id
     //std::cout << "insert " << u << "--" << v << std::endl;
     //int test = this->G->at(v).count(u);
@@ -71,13 +71,13 @@ bool CGraph::addEdge(int u, int v, int w) {
 
 
 
-void CGraph::addTriangle(int point1, int point2, int point3, std::vector<int> path) {
+void CGraph::addTriangle(int point1, int point2, int point3) {
     //todo split pair<ID,SP3D> into id -> add edge and add SP3D to vertexSP3D table
-    addEdge(point1, point2,path[0]);
+    addEdge(point1, point2,1.0f);
 
-    addEdge(point2, point3,path[1]);
+    addEdge(point2, point3,1.0f);
 
-    addEdge(point3, point1,path[2]);
+    addEdge(point3, point1,1.0f);
     std::vector<int> triangle {point1,point2,point3}; //tood 3dpoints
     this->m_matPointsofTraingle->push_back(triangle);
 
@@ -103,7 +103,7 @@ void CGraph::reconstructGraph(size_t size) {
     this->G3DTable = new std::vector<std::pair<int,int>>(size);
     //this->G3D = new std::vector<CTriangle::SPoint3D*>(size);
     this->m_matPointsofTraingle = new std::vector<std::vector<int>>;
-    this->m_edgeList = new std::unordered_map<int,int>;
+    this->m_edgeList = new std::unordered_map<int,float>;
     this->edgeCounter = 1;
     //this->edgeCounter = 0; //todo????
     this->triangleCounter = 0;
@@ -131,7 +131,7 @@ size_t CGraph::getSize() {
 }
 
 
-int CGraph::getEdgeWeight(int e) {
+float CGraph::getEdgeWeight(int e) {
     //todo return edge pointing on vertex withing specific triangle
     return this->m_edgeList->at(e);
 }
@@ -142,6 +142,15 @@ std::unordered_map<int,int> CGraph::getAdjacent(int u) {
 
 int CGraph::getNTriangles() {
     return this->triangleCounter;
+}
+
+void CGraph::setEdgeWeights(int VertexUID, int VertexVID, float w) {
+    this->m_edgeList->at(this->G->at(VertexUID).at(VertexVID)) = w;
+    this->m_edgeList->at(this->G->at(VertexVID).at(VertexUID)) = w;
+}
+
+int CGraph::getEdgeCounter() {
+    return this->edgeCounter;
 }
 
 

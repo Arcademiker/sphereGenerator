@@ -10,7 +10,7 @@ ExplorationAgenda::ExplorationAgenda() {
 
 
 ExplorationAgenda::~ExplorationAgenda() {
-    delete qPriorityQ;
+    delete this->qPriorityQ;
 }
 
 void ExplorationAgenda::Add(float nK, int nV) {

@@ -43,7 +43,7 @@ void main(){
 
 
 	// Output position of the vertex, in clip space : MVP * position
-	gl_Position =  MVP * vec4((vertexPosition_modelspace + normal*0.01 + 0.010 * normal * texture( myHeightmap, vertexUV ).x),1); //0.015
+	gl_Position =  MVP * vec4((vertexPosition_modelspace + normal*0.002 + 0.010 * normal * texture( myHeightmap, vertexUV ).x),1); //0.015
 
 }
 
