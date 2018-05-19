@@ -232,7 +232,7 @@ float CAStar::HScore(glm::vec3 fPos, glm::vec3 fPosTarget) {
     //return glm::angle(fPos,fPosTarget);
     fPos = glm::normalize(fPos);
     fPosTarget = glm::normalize(fPosTarget);
-    return acos(glm::dot(fPos, fPosTarget));
+    return 0.98f*acos(glm::dot(fPos, fPosTarget));
 
 }
 
@@ -255,9 +255,13 @@ const std::vector<CTriangle::SPoint3D> *CAStar::getRoute3DPoints() const{
 
 const std::vector<CTriangle::SPoint3D> *CAStar::getExpansed3DPoints() const {
     auto expansed = new std::vector<CTriangle::SPoint3D>;
+    //std::cout << std::endl;
     while (!explorationAgenda->IsEmpty()) {
+        //std::cout << this->explorationAgenda->testQueueTopKey() << " ";
         expansed->push_back(*this->get3DPoint(this->explorationAgenda->VisitTop()));
+
     }
+    std::cout << std::endl;
     return expansed;
 }
 

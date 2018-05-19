@@ -17,6 +17,7 @@ public:
     ~ExplorationAgenda();
     void Add(float nK, int nV);
     int VisitTop();
+    float testQueueTopKey();
     bool IsEmpty();
 };
 

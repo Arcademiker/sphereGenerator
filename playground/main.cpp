@@ -237,7 +237,7 @@ int main( )
 
 
     /// generate sphere object:
-    CTriangleTesselation triangleTesselation(0.5f,5);
+    CTriangleTesselation triangleTesselation(0.5f,7);
     //triangleTesselation.Tesselate(1);
     const std::vector<CTriangle>* triangles = triangleTesselation.GetTriangleList();
 
@@ -257,8 +257,8 @@ int main( )
     ///test AStar
 
     CAStar astar(triangleTesselation.GetGraph(),triangles);
-    //std::cout << "path length: " << astar.FindPath(12,5,500) << std::endl;
-    std::cout << "path length: " << astar.FindPath(187,27,500) << std::endl;
+    std::cout << "path length: " << astar.FindPath(629,65,500) << std::endl;
+    //std::cout << "path length: " << astar.FindPath(187,27,500) << std::endl;
     //astar.FindPath(7,6,500);
     std::vector<int> route = *astar.getRoute();
     const std::vector<CTriangle::SPoint3D>* points = astar.getRoute3DPoints();
@@ -480,8 +480,8 @@ int main( )
     glm::mat4 ViewMatrix = glm::mat4();
     glm::mat4 ProjectionMatrix = glm::mat4();
 
-    glm::vec3 linecolor = glm::vec3(1,1,0);
-    glm::vec3 pointcolor = glm::vec3(0.8,0.1,0.1);
+    glm::vec3 linecolor = glm::vec3(0.9,0.9,0);
+    glm::vec3 pointcolor = glm::vec3(1,0,0);
     ///ModelMatrix = glm::rotate( ModelMatrix,3.141592f,glm::vec3(0.0f,0.0f,1.0f));
     ///camera ini
 
@@ -513,7 +513,7 @@ int main( )
 		//ProjectionMatrix = getProjectionMatrix();
 
 		//controller
-		updateVPMatFromInput(&pCamera,0.004f);
+		updateVPMatFromInput(&pCamera,0.0008f);
 		ProjectionMatrix = pCamera.GetProjectionMatrix();
 		ViewMatrix = pCamera.GetViewMatrix();
         //mat4 rotation;
@@ -649,7 +649,7 @@ int main( )
 
         glBindVertexArray(VertexArrayID[2]);
         // Draw the Points !
-        glPointSize(5);
+        glPointSize(4);
         glDrawArrays(GL_POINTS, 0, expanse->size() );
         glBindVertexArray(0);
 		//glDisableVertexAttribArray(0);
@@ -745,11 +745,11 @@ void updateVPMatFromInput(CCamera* pCamera, float speed) {
 		//if (abs(axes[2] + 1.0f) > 0.1f) { pCamera->Translate(glm::vec3(0.0f, 1.0f * (axes[2] + 1.0f) * fMoveSpeed, 0.0f)); }
 		//if (abs(axes[5] + 1.0f) > 0.1f) { pCamera->Translate(glm::vec3(0.0f, -1.0f * (axes[5] + 1.0f) * fMoveSpeed, 0.0f)); }
 
-		if (fabsf(axes[0]) > 0.1f) { pCamera->Translate(glm::vec3(-1.0f * axes[0] * fMoveSpeed, 0.0f, 0.0f)); }
-		if (fabsf(axes[1]) > 0.1f) { pCamera->Translate(glm::vec3(0.0f, 1.0f * axes[1] * fMoveSpeed, 0.0f )); }
-		if (fabsf(axes[4]) > 0.1f) { pCamera->Rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.5f * axes[4] * fMoveSpeed * 10.0f); }
-		if (fabsf(axes[3]) > 0.1f) { pCamera->AddPitch(axes[3] * fMoveSpeed * 180.0f); }
-		if (fabsf(axes[2] + 1.0f) > 0.1f) { pCamera->Translate(glm::vec3(0.0f,0.0f,-1.0f * (axes[2] + 1.0f) * fMoveSpeed)); }
-		if (fabsf(axes[5] + 1.0f) > 0.1f) { pCamera->Translate(glm::vec3(0.0f,0.0f,1.0f * (axes[5] + 1.0f) * fMoveSpeed)); }
+		if (fabsf(axes[0]) > 0.01f) { pCamera->Translate(glm::vec3(-1.0f * axes[0] * fMoveSpeed, 0.0f, 0.0f)); }
+		if (fabsf(axes[1]) > 0.01f) { pCamera->Translate(glm::vec3(0.0f, 1.0f * axes[1] * fMoveSpeed, 0.0f )); }
+		if (fabsf(axes[4]) > 0.01f) { pCamera->Rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.5f * axes[4] * fMoveSpeed * 10.0f); }
+		if (fabsf(axes[3]) > 0.01f) { pCamera->AddPitch(axes[3] * fMoveSpeed * 180.0f); }
+		if (fabsf(axes[2] + 1.0f) > 0.01f) { pCamera->Translate(glm::vec3(0.0f,0.0f,-1.0f * (axes[2] + 1.0f) * fMoveSpeed)); }
+		if (fabsf(axes[5] + 1.0f) > 0.01f) { pCamera->Translate(glm::vec3(0.0f,0.0f,1.0f * (axes[5] + 1.0f) * fMoveSpeed)); }
 	}
 }
