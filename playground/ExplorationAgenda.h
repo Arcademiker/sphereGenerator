@@ -6,6 +6,14 @@
 
 #include <queue>
 
+/* ExplorationAgenda is a Priority Queue with key value pairs. The pair with the smallest key is on top.
+ * key is the float value for the f(n) score of A*.
+ * the value of the Priority Queue is the VertexID.
+ * why priority queue, why not multimap?
+ *  the std-priority_queue is faster than the std-multimap, because:
+ *   The typical underlying implementation of a multimap is a balanced red/black tree.
+ *   Repeated element removals from one of the extreme ends of a multimap has a good chance of skewing the tree,
+ *   requiring frequent rebalancing of the entire tree. This is going to be an expensive operation. */
 class ExplorationAgenda {
 private:
     // define (Key (nK), Value (nV)) Priority Queue (PriorityQ) ordered by Key (minimal Key on top):
@@ -17,7 +25,6 @@ public:
     ~ExplorationAgenda();
     void Add(float nK, int nV);
     int VisitTop();
-    float testQueueTopKey();
     bool IsEmpty();
 };
 

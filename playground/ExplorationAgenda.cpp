@@ -26,9 +26,6 @@ int ExplorationAgenda::VisitTop() {
     //todo throw empty exception
 }
 
-float ExplorationAgenda::testQueueTopKey() {
-    return this->qPriorityQ->top().first;
-}
 
 bool ExplorationAgenda::IsEmpty() {
     return this->qPriorityQ->empty();
